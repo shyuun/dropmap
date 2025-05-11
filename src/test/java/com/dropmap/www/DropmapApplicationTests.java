@@ -1,6 +1,6 @@
 package com.dropmap.www;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +16,7 @@ class DropmapApplicationTests {
     void contextLoads() {
         String body = this.restTemplate.getForObject("/", String.class);
 
-        Assertions.assertFalse(body.contains("FALSE STRING"));
+        assertFalse(body.contains("FALSE STRING"));
     }
 
 }

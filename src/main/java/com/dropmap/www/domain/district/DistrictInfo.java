@@ -14,7 +14,7 @@ import org.hibernate.annotations.Comment;
 @AllArgsConstructor
 @Entity
 @Table(name="DISTRICT_INFO")
-public class DisctrictInfo extends BaseUserEntity {
+public class DistrictInfo extends BaseUserEntity {
 
     @Id
     @Comment("구역코드")
@@ -23,7 +23,7 @@ public class DisctrictInfo extends BaseUserEntity {
 
     @Comment("행정구역명")
     @Column(name = "DISTRICT_NAME")
-    private String cmnName;
+    private String districtName;
 
     @Comment("상위구역코드")
     @Column(name = "P_DISTRICT_CODE")
@@ -31,7 +31,7 @@ public class DisctrictInfo extends BaseUserEntity {
 
     @Comment("상위구역명")
     @Column(name = "P_DISTRICT_NAME")
-    private String pCmnName;
+    private String pDistrictName;
 
     @Comment("위도")
     @Column(name="LAT")

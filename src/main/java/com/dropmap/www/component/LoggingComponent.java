@@ -13,6 +13,6 @@ public class LoggingComponent {
 
     @Before("execution(* com.dropmap.www.service..*(..)) || execution(* com.dropmap.www.web..*(..))")
     public void logMethodName(JoinPoint joinPoint) throws Throwable {
-        log.info("=====  " + joinPoint.getSignature().getName() + "=====");
+        log.info("=============================[ " + joinPoint.getSignature().getName() + " ]=============================");
     }
 }

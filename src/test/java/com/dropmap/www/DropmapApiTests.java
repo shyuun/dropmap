@@ -3,7 +3,8 @@ package com.dropmap.www;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,12 +86,12 @@ public class DropmapApiTests {
         ResponseEntity<String> response = restTemplate.exchange(apiUri, HttpMethod.GET, null, String.class);
 
         //THEN
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());//200인지 확인
-        Assertions.assertNotNull(response.getBody());//response JSON인지 확인
+        assertEquals(HttpStatus.OK, response.getStatusCode());//200인지 확인
+        assertNotNull(response.getBody());//response JSON인지 확인
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(response.getBody());
-        Assertions.assertTrue(jsonNode.path("response").path("body").has("items"));//data필드 존재하는지 확인
+        assertTrue(jsonNode.path("response").path("body").has("items"));//data필드 존재하는지 확인
     }
 
     @Test
@@ -113,8 +114,8 @@ public class DropmapApiTests {
             ResponseEntity<String> response = restTemplate.exchange(apiUri, HttpMethod.GET, null, String.class);
 
             //THEN
-            Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());//200인지 확인
-            Assertions.assertNotNull(response.getBody());//response JSON인지 확인
+            assertEquals(HttpStatus.OK, response.getStatusCode());//200인지 확인
+            assertNotNull(response.getBody());//response JSON인지 확인
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = null;
@@ -133,7 +134,7 @@ public class DropmapApiTests {
                 latestPath = fieldNames.next();
             }
 
-            Assertions.assertNotNull(latestPath);//data필드 존재하는지 확인
+            assertNotNull(latestPath);//data필드 존재하는지 확인
         });
     }
 
@@ -189,8 +190,8 @@ public class DropmapApiTests {
             ResponseEntity<String> response = restTemplate.exchange(apiUri, HttpMethod.GET, null, String.class);
 
             //THEN
-            Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());//200인지 확인
-            Assertions.assertNotNull(response.getBody());//response JSON인지 확인
+            assertEquals(HttpStatus.OK, response.getStatusCode());//200인지 확인
+            assertNotNull(response.getBody());//response JSON인지 확인
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = null;
@@ -201,7 +202,7 @@ public class DropmapApiTests {
             }
             JsonNode dataArr = jsonNode.path("data");
             int totalCount = jsonNode.path("totalCount").asInt(0);//data필드 존재하는지 확인
-            Assertions.assertTrue(totalCount > 0);
+            assertTrue(totalCount > 0);
         });
 
     }
@@ -225,8 +226,8 @@ public class DropmapApiTests {
         ResponseEntity<String> response = restTemplate.exchange(apiUri, HttpMethod.GET, entity, String.class);
 
         //THEN
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());//200인지 확인
-        Assertions.assertNotNull(response.getBody());//response JSON인지 확인
+        assertEquals(HttpStatus.OK, response.getStatusCode());//200인지 확인
+        assertNotNull(response.getBody());//response JSON인지 확인
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = null;
@@ -237,7 +238,7 @@ public class DropmapApiTests {
         }
 
         int totalCount = jsonNode.path("meta").path("totalCount").asInt(0);
-        Assertions.assertTrue(totalCount > 0);//data필드 존재하는지 확인
+        assertTrue(totalCount > 0);//data필드 존재하는지 확인
     }
 
     @Test
@@ -260,8 +261,8 @@ public class DropmapApiTests {
         ResponseEntity<String> response = restTemplate.exchange(apiUri, HttpMethod.GET, entity, String.class);
 
         //THEN
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());//200인지 확인
-        Assertions.assertNotNull(response.getBody());//response JSON인지 확인
+        assertEquals(HttpStatus.OK, response.getStatusCode());//200인지 확인
+        assertNotNull(response.getBody());//response JSON인지 확인
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = null;
@@ -272,7 +273,7 @@ public class DropmapApiTests {
         }
 
         String resultName = jsonNode.path("status").path("name").asText();
-        Assertions.assertEquals("ok",resultName);//상태값 정상인지 확인
+        assertEquals("ok",resultName);//상태값 정상인지 확인
     }
 
     @Test
@@ -302,13 +303,13 @@ public class DropmapApiTests {
             ResponseEntity<String> response = restTemplate.exchange(apiUri, HttpMethod.GET, entity, String.class);
 
             //THEN
-            Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());//200인지 확인
-            Assertions.assertNotNull(response.getBody());//response JSON인지 확인
+            assertEquals(HttpStatus.OK, response.getStatusCode());//200인지 확인
+            assertNotNull(response.getBody());//response JSON인지 확인
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(response.getBody());
             int totalCount = jsonNode.path("response").path("record").path("total").asInt(0);
-            Assertions.assertTrue(totalCount > 0);//data필드 존재하는지 확인
+            assertTrue(totalCount > 0);//data필드 존재하는지 확인
         }
     }
 }
