@@ -2,6 +2,7 @@ package com.dropmap.www.service;
 
 import com.dropmap.www.domain.district.DistrictInfoRepository;
 import com.dropmap.www.domain.geolocation.GeolocationInfoRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -30,5 +32,18 @@ public class DataProcessorServiceTest {
 
         assertEquals(0, districtInfoRepository.count());
         assertEquals(0, geolocationInfoRepository.count());
+    }
+
+    @Test
+    void OPENAPI_저장이_정상적으로된다() throws JsonProcessingException, InterruptedException {
+        dataProcessorService.clearDatabase();
+
+        assertEquals(0, districtInfoRepository.count());
+        assertEquals(0, geolocationInfoRepository.count());
+
+        dataProcessorService.insertOpenApiData();
+
+        assertTrue(districtInfoRepository.count() > 0);
+        assertTrue(geolocationInfoRepository.count() > 0);
     }
 }

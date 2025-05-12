@@ -42,7 +42,7 @@ public class DistrictInfo extends BaseUserEntity {
     private String Lot;
 
     @Comment("경계")
-    @Column(name = "BOUNDARY")
+    @Column(name = "BOUNDARY", columnDefinition = "MEDIUMTEXT")
     private String boundary;
 
     @Comment("깊이")

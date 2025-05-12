@@ -129,8 +129,12 @@ public class GovDataApiService {
     }
 
     public List<String> getFileDataApiUrls() {
+        List<String> urls = new ArrayList<>();
+        return urls;
     }
 
     public Set<String> getFileDataApiCoords(List<String> fileDataUrlList) {
+        Set<String> coordsSet = new HashSet<>();
+        return coordsSet;
     }
 }

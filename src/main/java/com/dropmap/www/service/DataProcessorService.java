@@ -56,7 +56,7 @@ public class DataProcessorService extends DataInitializer {
     }
 
     @Override
-    protected void insertFileApiData() {
+    protected void insertFileApiData() throws JsonProcessingException {
         List<String> fileDataUrlList = govDataApiService.getFileDataApiUrls();
         Set<String> coordsSet = govDataApiService.getFileDataApiCoords(fileDataUrlList);
         List<Map<String, String>> structuredAddressList = naverApiService.getAddress(coordsSet);
@@ -64,7 +64,7 @@ public class DataProcessorService extends DataInitializer {
     }
 
     @Override
-    protected void insertUnstructuredData() {
+    protected void insertUnstructuredData() throws JsonProcessingException {
         Set<String> coordsSet = unstructedDataService.getUnstructuredDataCoords();
         List<Map<String, String>> structuredAddressList = naverApiService.getAddress(coordsSet);
         dataInsertService.insertData(structuredAddressList);

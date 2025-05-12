@@ -13,6 +13,6 @@ public abstract class DataInitializer {
 
     protected abstract void clearDatabase();
     protected abstract void insertOpenApiData() throws JsonProcessingException, InterruptedException;
-    protected abstract void insertFileApiData();
-    protected abstract void insertUnstructuredData();
+    protected abstract void insertFileApiData() throws JsonProcessingException;
+    protected abstract void insertUnstructuredData() throws JsonProcessingException;
 }
