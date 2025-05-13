@@ -2,7 +2,7 @@ package com.dropmap.www.service;
 
 import com.dropmap.www.domain.district.DistrictInfoRepository;
 import com.dropmap.www.domain.geolocation.GeolocationInfoRepository;
-import com.dropmap.www.domain.source.SourceRepository;
+import com.dropmap.www.domain.source.SourceInfoRepository;
 import com.dropmap.www.domain.unstructured.UnstructuredDataInfoRepository;
 import com.dropmap.www.service.api.GovDataApiService;
 import com.dropmap.www.service.api.NaverApiService;
@@ -24,7 +24,7 @@ public class DataProcessorService extends DataInitializer {
     private final EntityManager entityManager;
     private final DistrictInfoRepository districtInfoRepository;
     private final GeolocationInfoRepository geolocationInfoRepository;
-    private final SourceRepository sourceRepository;
+    private final SourceInfoRepository sourceInfoRepository;
     private final UnstructuredDataInfoRepository unstructuredDataInfoRepository;
     private final GovDataApiService govDataApiService;
     private final NaverApiService naverApiService;

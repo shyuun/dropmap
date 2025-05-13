@@ -46,4 +46,30 @@ public class DataProcessorServiceTest {
         assertTrue(districtInfoRepository.count() > 0);
         assertTrue(geolocationInfoRepository.count() > 0);
     }
+
+    @Test
+    void 지자체데이터_저장이_정상적으로된다() throws JsonProcessingException, InterruptedException {
+        dataProcessorService.clearDatabase();
+
+        assertEquals(0, districtInfoRepository.count());
+        assertEquals(0, geolocationInfoRepository.count());
+
+        dataProcessorService.insertFileApiData();
+
+        assertTrue(districtInfoRepository.count() > 0);
+        assertTrue(geolocationInfoRepository.count() > 0);
+    }
+
+    @Test
+    void 비형식데이터_저장이_정상적으로된다() throws JsonProcessingException, InterruptedException {
+        dataProcessorService.clearDatabase();
+
+        assertEquals(0, districtInfoRepository.count());
+        assertEquals(0, geolocationInfoRepository.count());
+
+        dataProcessorService.insertUnstructuredData();
+
+        assertTrue(districtInfoRepository.count() > 0);
+        assertTrue(geolocationInfoRepository.count() > 0);
+    }
 }

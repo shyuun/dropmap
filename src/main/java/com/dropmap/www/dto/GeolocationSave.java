@@ -11,19 +11,19 @@ public class GeolocationSave {
     private String lot;
     private String roadAddress;
     private String lotAddress;
-    private String regionCode;
-    private String legalDongCode;
-    private String admDongCode;
+    private String regionName;
+    private String legalDongName;
+    private String admDongName;
 
     @Builder
-    public GeolocationSave(String lat, String lot, String roadAddress, String lotAddress, String regionCode, String legalDongCode, String admDongCode){
+    public GeolocationSave(String lat, String lot, String roadAddress, String lotAddress, String regionName, String legalDongName, String admDongName){
         this.lat = lat;
         this.lot = lot;
         this.roadAddress = roadAddress;
         this.lotAddress = lotAddress;
-        this.regionCode = regionCode;
-        this.legalDongCode = legalDongCode;
-        this.admDongCode = admDongCode;
+        this.regionName = regionName;
+        this.legalDongName = legalDongName;
+        this.admDongName = admDongName;
     }
 
 

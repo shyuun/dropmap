@@ -71,8 +71,8 @@ public class NaverApiService {
                         throw new RuntimeException(e);
                     }
 
-                    String resultCode = jsonNode.path("status").path("code").asText("9999");
-                    String resultMsg = jsonNode.path("status").path("message").asText("9999");
+                    String resultCode = jsonNode.path("status").path("code").asText("");
+                    String resultMsg = jsonNode.path("status").path("message").asText("");
 
                     if(!"0".equals(resultCode)){
                         //비정상

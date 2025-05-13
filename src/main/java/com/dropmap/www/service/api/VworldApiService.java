@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -54,10 +55,20 @@ public class VworldApiService {
                 .build()
                 .toUri();
 
-        ResponseEntity<String> response = restTemplate.exchange(apiUri, HttpMethod.GET, getHttpEntity(), String.class);
+        ResponseEntity<String> response = null;
 
-        //에러처리
-        apiErrorHandler(response,apiUri,retryCount);
+        try {
+            response = restTemplate.exchange(apiUri, HttpMethod.GET, getHttpEntity(), String.class);
+        } catch (HttpClientErrorException e) {
+            //에러처리
+            apiErrorHandler(response,apiUri,retryCount);
+            //TODO TEST
+//            if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
+//                // 400 에러 처리
+//                String body = e.getResponseBodyAsString();
+//                System.out.println("400 에러 발생: " + body);
+//            }
+        }
 
         //데이터파싱
         ObjectMapper objectMapper = new ObjectMapper();
