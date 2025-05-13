@@ -27,17 +27,16 @@ public class DataInsertSerivce {
     private final VworldApiService vworldApiService;
     private final JdbcTemplate jdbcTemplate;
 
-    public void insertData(List<Map<String, String>> structuredAddressList) throws JsonProcessingException {
+    public void insertData(List<Map<String, String>> addressList) throws JsonProcessingException {
 
         String dNm = "",pDNm = "",ppDNm = "";
         String dCd ="A0001", pDCd = "A0001", regionCode = "";
         Set<String> regionCodeSet = new HashSet<>();
         int pNum = 0,ppNum = 0;
         int ppp = 0;
-
         List<GeolocationSave> geolocationSaveList = new ArrayList<>();
 
-        for(Map<String,String> m : structuredAddressList){
+        for(Map<String,String> m : addressList){
             
             //오류데이터 NULL처리
             for (Map.Entry<String, String> entry : m.entrySet()) {
@@ -64,7 +63,10 @@ public class DataInsertSerivce {
 
                 if(resultCnt < 1){
                     char prefix = (char) ('A' + (pNum));
-                    if(i != 1){
+                    if(i == 1){
+                        pDCd = "A0001";//서울특별시
+                        dCd = "A0001";//서울특별시
+                    } else {
                         //부모키 가져옴
                         pDCd = districtInfoRepository.findParentDistrictCodeByDistrictName(ppDNm,pDNm,ppNum);
 
@@ -107,22 +109,30 @@ public class DataInsertSerivce {
 
             ppp ++;
 
+//            geolocationInfoRepository.insertGeolocation(GeolocationSave.builder()
+//                    .lat(m.get("lat"))
+//                    .lot(m.get("lot"))
+//                    .roadAddress(m.get("roadAddress"))
+//                    .lotAddress(m.get("lotAddress"))
+//                    .regionName(m.get("area2"))
+//                    .legalDongName(m.get("area3"))
+//                    .admDongName(m.get("area4"))
+//                    .build());
+
+            List<Object[]> districtCodes = districtInfoRepository.findDistrictCodeByDistrictName(m.get("area2"),m.get("area3"),m.get("area4"));
+
+
             //BULK INSERT를 위한 데이터 LIST 추가
-            GeolocationSave geoLocationSave = GeolocationSave.builder()
+            geolocationSaveList.add(GeolocationSave.builder()
                     .lat(m.get("lat"))
                     .lot(m.get("lot"))
                     .roadAddress(m.get("roadAddress"))
                     .lotAddress(m.get("lotAddress"))
-                    .regionName(m.get("area2"))
-                    .legalDongName(m.get("area3"))
-                    .admDongName(m.get("area4"))
-                    .build();
-
-            geolocationSaveList.add(geoLocationSave);
-
-            regionCodeSet.add(regionCode);
+                    .regionCode((String) districtCodes.get(0)[0])
+                    .legalDongCode((String) districtCodes.get(0)[1])
+                    .admDongCode((String) districtCodes.get(0)[2])
+                    .build());
         }
-
         //FOR문 종료 후 BULKINSERT
         bulkInsertGeolocationInfo(geolocationSaveList);
     }
@@ -132,26 +142,7 @@ public class DataInsertSerivce {
         String sql = """
                 INSERT INTO GEOLOCATION_INFO 
                 (LAT, LOT, REGION_CODE, LEGAL_DONG_CODE, ADM_DONG_CODE, ROAD_ADDRESS, LOT_ADDRESS, USE_YN, REG_DT, REG_NM, UPT_DT, UPT_NM)
-                SELECT
-                ?,
-                ?,
-                REGION.DISTRICT_CODE,
-                LEGAL.DISTRICT_CODE,
-                ADMIN.DISTRICT_CODE,
-                ?
-                ?,
-                'Y',
-                NOW(),
-                'SYSTEM',
-                NOW(),
-                'SYSTEM'
-                FROM DISTRICT_INFO REGION
-                JOIN DISTRICT_INFO LEGAL ON LEGAL.P_DISTRICT_CODE = REGION.DISTRICT_CODE AND LEGAL.DEPTH = 2
-                JOIN DISTRICT_INFO ADMIN ON ADMIN.P_DISTRICT_CODE = LEGAL.DISTRICT_CODE AND ADMIN.DEPTH = 3
-                WHERE REGION.DEPTH = 1
-                AND REGION.DISTRICT_NAME = ?
-                AND LEGAL.DISTRICT_NAME = ?
-                AND ADMIN.DISTRICT_NAME = ?
+                VALUES(?,?,?,?,?,?,?,'Y',NOW(),'SYSTEM',NOW(),'SYSTEM')
                 """;
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 
@@ -160,11 +151,11 @@ public class DataInsertSerivce {
                 GeolocationSave geolocationSave = geolocationSaveList.get(i);
                 ps.setString(1, geolocationSave.getLat());
                 ps.setString(2, geolocationSave.getLot());
-                ps.setString(3, geolocationSave.getRoadAddress());
-                ps.setString(4, geolocationSave.getLotAddress());
-                ps.setString(5, geolocationSave.getRegionName());
-                ps.setString(6, geolocationSave.getLegalDongName());
-                ps.setString(7, geolocationSave.getAdmDongName());
+                ps.setString(3, geolocationSave.getRegionCode());
+                ps.setString(4, geolocationSave.getLegalDongCode());
+                ps.setString(5, geolocationSave.getAdmDongCode());
+                ps.setString(6, geolocationSave.getRoadAddress());
+                ps.setString(7, geolocationSave.getLotAddress());
             }
 
             @Override
@@ -173,5 +164,4 @@ public class DataInsertSerivce {
             }
         });
     }
-
 }
