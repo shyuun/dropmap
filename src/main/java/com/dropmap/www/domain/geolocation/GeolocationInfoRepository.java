@@ -1,11 +1,14 @@
 package com.dropmap.www.domain.geolocation;
 
+import com.dropmap.www.dto.DistrictInfoResponse;
 import com.dropmap.www.dto.GeolocationSave;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 public interface GeolocationInfoRepository extends JpaRepository<GeolocationInfo, GeolocationId> {
 
@@ -36,5 +39,43 @@ public interface GeolocationInfoRepository extends JpaRepository<GeolocationInfo
                 AND ADMIN.DISTRICT_NAME = :#{#geo.admDongName}
             """,nativeQuery = true)
     int insertGeolocation(@Param("geo") GeolocationSave geolocationSave);
+    
+    @Query("SELECT new com.dropmap.www.dto.DistrictInfoResponse( " +
+            "COUNT(g), " +
+            "(SELECT c.districtCode FROM DistrictInfo c WHERE c.depth = 0), " +
+            "(SELECT c.districtName FROM DistrictInfo c WHERE c.depth = 0), " +
+            "(SELECT c.Lat FROM DistrictInfo c WHERE c.depth = 0), " +
+            "(SELECT c.Lot FROM DistrictInfo c WHERE c.depth = 0), " +
+            "(SELECT c.boundary FROM DistrictInfo c WHERE c.depth = 0) " +
+            ")"+
+            "FROM GeolocationInfo g ")
+    List<DistrictInfoResponse> findCityCounts();
 
+    @Query("SELECT new com.dropmap.www.dto.DistrictInfoResponse( " +
+            "COUNT(g), " +
+            "g.regionCode, " +
+            "d.districtName, " +
+            "d.Lat, " +
+            "d.Lot, " +
+            "d.boundary" +
+            ")  " +
+            "FROM GeolocationInfo g " +
+            "JOIN DistrictInfo d " +
+            "ON d.districtCode = g.regionCode " +
+            "GROUP BY g.regionCode,d.Lat,d.Lot,d.districtName,d.boundary")
+    List<DistrictInfoResponse> findRegionCounts();
+
+    @Query("SELECT new com.dropmap.www.dto.DistrictInfoResponse( " +
+            "COUNT(g), " +
+            "g.legalDongCode, " +
+            "d.districtName," +
+            "d.Lat, " +
+            "d.Lot, " +
+            "d.boundary" +
+            ")  " +
+            "FROM GeolocationInfo g " +
+            "JOIN DistrictInfo d " +
+            "ON d.districtCode = g.legalDongCode " +
+            "GROUP BY g.regionCode,g.legalDongCode,d.Lat,d.Lot,d.districtName,d.boundary")
+    List<DistrictInfoResponse> findLegalDongCounts();
 }
