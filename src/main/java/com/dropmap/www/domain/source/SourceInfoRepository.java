@@ -21,4 +21,8 @@ public interface SourceInfoRepository extends JpaRepository<SourceInfo, Long> {
     void updateUptYnBySourceDataName(@Param("sourceDataName") String regionNm);
 
     List<SourceInfo> findBySourceTypeInAndUptYnAndSourceCodeIsNotNull(List<String> sourceTypes, String uptYn);
+
+    @Modifying
+    @Query("UPDATE SourceInfo s SET s.uptYn = 'N'")
+    int resetUptYnAll();
 }

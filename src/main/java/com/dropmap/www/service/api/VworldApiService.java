@@ -55,20 +55,10 @@ public class VworldApiService {
                 .build()
                 .toUri();
 
-        ResponseEntity<String> response = null;
+        ResponseEntity<String> response = restTemplate.exchange(apiUri, HttpMethod.GET, getHttpEntity(), String.class);
 
-        try {
-            response = restTemplate.exchange(apiUri, HttpMethod.GET, getHttpEntity(), String.class);
-        } catch (HttpClientErrorException e) {
-            //에러처리
-            apiErrorHandler(response,apiUri,retryCount);
-            //TODO TEST
-//            if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
-//                // 400 에러 처리
-//                String body = e.getResponseBodyAsString();
-//                System.out.println("400 에러 발생: " + body);
-//            }
-        }
+        //에러처리
+        apiErrorHandler(response,apiUri,retryCount);
 
         //데이터파싱
         ObjectMapper objectMapper = new ObjectMapper();

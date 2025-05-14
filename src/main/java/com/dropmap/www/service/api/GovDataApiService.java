@@ -1,5 +1,6 @@
 package com.dropmap.www.service.api;
 
+import com.dropmap.www.component.LoggingComponent;
 import com.dropmap.www.domain.source.SourceInfo;
 import com.dropmap.www.domain.source.SourceInfoRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -7,6 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -179,7 +182,7 @@ public class GovDataApiService {
                 throw new RuntimeException(e);
             }
             JsonNode dataArr = jsonNode.path("data");
-            int totalCount = jsonNode.path("totalCount").asInt(0);//data필드 존재하는지 확인
+            totalDataCount += jsonNode.path("totalCount").asInt(0);//data필드 존재하는지 확인
 
             for(JsonNode data : dataArr){
                 String lat = data.path("위도").asText("").replaceAll("[^0-9eE.\\-]", "");
@@ -198,12 +201,12 @@ public class GovDataApiService {
                 //서울시에 속하는 위경도인지 확인
                 if(Math.abs(Double.parseDouble(lat)) <= 1e-8 || Math.abs(Double.parseDouble(lot)) <= 1e-8
                         ||Double.parseDouble(lat) < SEOUL_LAT_MIN || Double.parseDouble(lat) > SEOUL_LAT_MAX ||
-                        Double.parseDouble(lot) < SEOUL_LOT_MIN || Double.parseDouble(lot) > SEOUL_LOT_MAX){
-                    //이상 데이터 add
-                    String coord = handleMissingCoordnates(data,"주소");
-                    if(coord != null){
-                        coordsSet.add(coord);
-                    }
+                            Double.parseDouble(lot) < SEOUL_LOT_MIN || Double.parseDouble(lot) > SEOUL_LOT_MAX){
+                        //이상 데이터 add
+                        String coord = handleMissingCoordnates(data,"주소");
+                        if(coord != null){
+                            coordsSet.add(coord);
+                        }
                     continue;
                 }
 
@@ -260,5 +263,15 @@ public class GovDataApiService {
         }
 
         return coord;
+    }
+
+    public void printStatLog(){
+        Logger logger = LoggerFactory.getLogger(GovDataApiService.class);
+        logger.info("================================= totalDataCount : " + totalDataCount + " | errorDataCount : " + errorDataCount + " | fixDataCount : " + fixDataCount + "=================================");
+        logger.info("=================================ABNORMAL_LIST COUNT : " + ABNORMAL_LIST.size() + "=================================");
+        logger.info("=================================ABNORMAL_LIST=================================");
+        logger.info(ABNORMAL_LIST.toString());
+        logger.info("=================================ABNORMAL_LIST=================================");
+
     }
 }

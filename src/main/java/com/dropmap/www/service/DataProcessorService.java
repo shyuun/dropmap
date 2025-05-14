@@ -38,10 +38,12 @@ public class DataProcessorService extends DataInitializer {
         insertOpenApiData();
         insertFileApiData();
         insertUnstructuredData();
+        govDataApiService.printStatLog();
     }
 
     @Override
     protected void clearDatabase() {
+        sourceInfoRepository.resetUptYnAll();
         districtInfoRepository.deleteAllInBatch();
         geolocationInfoRepository.deleteAllInBatch();
         entityManager.flush();
