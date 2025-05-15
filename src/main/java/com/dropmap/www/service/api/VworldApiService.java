@@ -7,12 +7,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,7 +35,19 @@ public class VworldApiService {
     private static final int MAX_RETRY_COUNT = 10;
     private static final long RETRY_DELAY_MILLIS = 2000;
 
-    public String getBoundary(String coords, int depth) throws JsonProcessingException {
+    @Async("asyncExecutor")
+    public CompletableFuture<String> getBoundaryAsync(String coords, int depth) {
+        log.info("Current Thread: {}", Thread.currentThread().getName());
+        try {
+            String result = getBoundaryInternal(coords, depth);
+            return CompletableFuture.completedFuture(result);
+        } catch (Exception e) {
+            log.error("getBoundaryAsync 실패: {}", coords, e);
+            return CompletableFuture.completedFuture(null);
+        }
+    }
+
+    public String getBoundaryInternal(String coords, int depth) throws JsonProcessingException {
 
         int retryCount = 0;
         String lot = coords.split(",")[0];

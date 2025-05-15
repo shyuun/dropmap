@@ -18,6 +18,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 @Service
@@ -37,6 +38,8 @@ public class DataInsertSerivce {
         Set<String> regionNameSet = new HashSet<>();
         LinkedHashSet<DistrictInfo> districtInfoSet = new LinkedHashSet<>();
         LinkedHashSet<GeolocationSave> geolocationSaveSet = new LinkedHashSet<>();
+        Map<String, CompletableFuture<String>> futureBoundaryMap = new HashMap<>();
+        Map<String, DistrictInfo> districtInfoMap = new HashMap<>();
 
         for(Map<String,String> m : addressList){
             regionNameSet.add(regionName);
@@ -53,50 +56,45 @@ public class DataInsertSerivce {
             for(int i=0; i<3; i++){
                 String pDistrictName = m.get("area"+i);
                 String districtName = m.get("area"+(i+1));
-                DistrictInfo districtInfo = DistrictInfo.builder().id(DistrictInfoId.builder()
-                        .pDistrictName(pDistrictName)
-                        .districtName(districtName)
-                        .build())
+                String key = pDistrictName + "_" + districtName;
+
+                if(districtInfoMap.containsKey(key)) continue;//Set에 존재하지 않을때만 진행
+
+                boolean exist = districtInfoRepository.existsDistrictNameAndParentName(pDistrictName,districtName);
+
+                if(exist) continue;
+
+                //Set에도 존재하지않고 db에도 존재하지 않으면 DistrictInfo 저장을 위한 DTO 생성
+                String address = switch (i) {
+                    case 0 -> m.get("area1");//서울특별시
+                    case 3 -> m.get("area2") + " " + m.get("area4");//강남구 역삼2동
+                    default -> pDistrictName + " " + districtName;
+                };
+
+                String lot = null, lat = null;
+
+                String coords = naverApiService.getCoord(address);//주소 -> 위경도 데이터
+
+                if(coords != null){
+                    lot = coords.split(",")[0];
+                    lat = coords.split(",")[1];
+                }
+
+                // 비동기로 boundary 호출
+                futureBoundaryMap.put(key, vworldApiService.getBoundaryAsync(coords, i));
+
+                //구역정보 set에 추가
+                DistrictInfo info = DistrictInfo.builder()
+                        .id(DistrictInfoId.builder()
+                                .pDistrictName(pDistrictName)
+                                .districtName(districtName)
+                                .build())
+                        .Lat(Double.parseDouble(lat))
+                        .Lot(Double.parseDouble(lot))
+                        .depth(i)
                         .build();
 
-                if(!districtInfoSet.contains(districtInfo)){
-                    //Set에 존재하지 않을때만 진행
-                    boolean exist = districtInfoRepository.existsDistrictNameAndParentName(pDistrictName,districtName);
-
-                    if(!exist){
-                        //Set에도 존재하지않고 db에도 존재하지 않으면 DistrictInfo 저장을 위한 DTO 생성
-                        String address = pDistrictName + " " + districtName;
-
-                        if(i == 0){
-                            address = m.get("area1");//서울특별시
-                        } else if (i == 3){
-                            address = m.get("area2") + " " + m.get("area4");//강남구 역삼2동
-                        }
-
-                        String lot = null, lat = null;
-
-                        String coords = naverApiService.getCoord(address);//주소 -> 위경도 데이터
-
-                        if(coords != null){
-                            lot = coords.split(",")[0];
-                            lat = coords.split(",")[1];
-                        }
-
-                        String boundary = vworldApiService.getBoundary(coords,i);
-
-                        //구역정보 set에 추가
-                        districtInfoSet.add(DistrictInfo.builder()
-                                .id(DistrictInfoId.builder()
-                                        .pDistrictName(pDistrictName)
-                                        .districtName(districtName)
-                                        .build())
-                                .boundary(boundary)
-                                .Lat(Double.parseDouble(lat))
-                                .Lot(Double.parseDouble(lot))
-                                .depth(i)
-                                .build());
-                    }
-                }
+                districtInfoMap.put(key, info);
             }
 
             //의류수거함 정보 set에 추가
@@ -110,6 +108,16 @@ public class DataInsertSerivce {
                     .admDongName(m.get("area4"))
                     .build());
         }
+
+        // 비동기 호출 결과 대기 및 반영
+        CompletableFuture.allOf(futureBoundaryMap.values().toArray(new CompletableFuture[0])).join();
+        for (Map.Entry<String, CompletableFuture<String>> entry : futureBoundaryMap.entrySet()) {
+            String key = entry.getKey();
+            String boundary = entry.getValue().join();
+            districtInfoMap.get(key).setBoundary(boundary);
+        }
+
+        districtInfoSet.addAll(districtInfoMap.values());
 
         //행정구역정보 BULK INSERT
         batchInsertDistrictInfo(districtInfoSet);

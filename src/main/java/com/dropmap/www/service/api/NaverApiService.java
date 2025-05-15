@@ -7,12 +7,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,97 +40,109 @@ public class NaverApiService {
     private static final long RETRY_DELAY_MILLIS = 2000;
 
     public List<Map<String, String>> getAddress(Set<String> coords) {
-        
-        //좌표를 정제된 주소,좌표의 리스트로 전환
-        List<Map<String,String>> addressList = coords.stream()
+        List<CompletableFuture<Map<String, String>>> futures = coords.stream()
                 .filter(coord -> !coord.trim().equals(","))
-                .map(coord -> {
+                .map(this::getAddressAsync)
+                .toList();
 
-                    Map<String, String> resultMap = new HashMap<>();
-                    String area1 = "",area2 = "",area3 = "",area4 = "";
-                    String roadAddress = "",lotAddress = "";
-                    int retryCount = 0;
-
-                    //API 호출
-                    URI apiUri = UriComponentsBuilder.fromUriString("https://"+naverApiReverseGeocodingUrl)
-                            .queryParam("output","json")
-                            .queryParam("coords",coord)
-                            .queryParam("orders","legalcode,admcode,addr,roadaddr")/*법정동,행정동,지번,도로명*/
-                            .build(true)
-                            .toUri();
-
-                    ResponseEntity<String> response = restTemplate.exchange(apiUri, HttpMethod.GET, getHttpEntity(), String.class);
-
-                    //에러처리
-                    apiErrorHandler(response,apiUri,retryCount);
-
-                    //데이터 파싱
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    JsonNode jsonNode = null;
-                    try {
-                        jsonNode = objectMapper.readTree(response.getBody());
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    String resultCode = jsonNode.path("status").path("code").asText("");
-                    String resultMsg = jsonNode.path("status").path("message").asText("");
-
-                    if(!"0".equals(resultCode)){
-                        //비정상
-                        throw new IllegalArgumentException("["+resultCode+"] " + resultMsg);
-                    }
-
-                    JsonNode resultsNode = jsonNode.path("results");
-                    for (JsonNode result : resultsNode) {
-                        String name = result.path("name").asText();//legalcode,admcode,addr,roadaddr
-
-                        if("legalcode".equals(name)){//법정동
-                            area1 = result.path("region").path("area1").path("name").asText();//서울특별시
-                            area2 = result.path("region").path("area2").path("name").asText();//강남구
-                            area3 = result.path("region").path("area3").path("name").asText();//역삼동
-                        } else if ("admcode".equals(name)){//행정동
-                            area4 = result.path("region").path("area3").path("name").asText();//역삼 2동
-                        } else if ("addr".equals(name)){//지번 주소
-                            lotAddress = result.path("region").path("area1").path("name").asText();//서울특별시
-                            lotAddress += " " + result.path("region").path("area2").path("name").asText();//강남구
-                            lotAddress += " " + result.path("region").path("area3").path("name").asText();//역삼동
-                            lotAddress += " " + result.path("land").path("number1").asText();//719
-                            if(!"".equals(result.path("land").path("number2").asText(""))){
-                                lotAddress += "-" + result.path("land").path("number2").asText("");//24
-                            }
-                        } else if ("roadaddr".equals(name)){//도로명 주소
-                            roadAddress = result.path("region").path("area1").path("name").asText();//서울특별시
-                            roadAddress += " " + result.path("region").path("area2").path("name").asText();//강남구
-                            roadAddress += " " + result.path("region").path("area3").path("name").asText();//역삼동
-                            roadAddress += " " + result.path("land").path("name").asText();//85길
-                            roadAddress += " " + result.path("land").path("number1").asText();//32
-                        }
-                    }
-
-                    String lot = coord.split(",")[0];
-                    String lat = coord.split(",")[1];
-
-                    resultMap.put("lot",lot);
-                    resultMap.put("lat",lat);
-                    resultMap.put("area0","대한민국");
-                    resultMap.put("area1",area1);
-                    resultMap.put("area2",area2);
-                    resultMap.put("area3",area3);
-                    resultMap.put("area4",area4);
-                    resultMap.put("lotAddress",lotAddress);
-                    resultMap.put("roadAddress",roadAddress);
-
-                    if(!"서울특별시".equals(area1)){
-                        return null;
-                    }
-
-                    return resultMap;
-                })
+        return futures.stream()
+                .map(CompletableFuture::join)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
 
-        return addressList;
+    @Async("asyncExecutor")
+    public CompletableFuture<Map<String, String>> getAddressAsync(String coord) {
+        try {
+            return CompletableFuture.completedFuture(getAddressSingle(coord));
+        } catch (Exception e) {
+            log.error("[Async ERROR] coord: {} | msg: {}", coord, e.getMessage());
+            return CompletableFuture.completedFuture(null);
+        }
+    }
+
+    private Map<String, String> getAddressSingle(String coord) throws JsonProcessingException {
+        Map<String, String> resultMap = new HashMap<>();
+
+        String area1 = "",area2 = "",area3 = "",area4 = "";
+        String roadAddress = "",lotAddress = "";
+        int retryCount = 0;
+
+        //API 호출
+        URI apiUri = UriComponentsBuilder.fromUriString("https://"+naverApiReverseGeocodingUrl)
+                .queryParam("output","json")
+                .queryParam("coords",coord)
+                .queryParam("orders","legalcode,admcode,addr,roadaddr")/*법정동,행정동,지번,도로명*/
+                .build(true)
+                .toUri();
+
+        ResponseEntity<String> response = restTemplate.exchange(apiUri, HttpMethod.GET, getHttpEntity(), String.class);
+
+        //에러처리
+        apiErrorHandler(response,apiUri,retryCount);
+
+        //데이터 파싱
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = null;
+        try {
+            jsonNode = objectMapper.readTree(response.getBody());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        String resultCode = jsonNode.path("status").path("code").asText("");
+        String resultMsg = jsonNode.path("status").path("message").asText("");
+
+        if(!"0".equals(resultCode)){
+            //비정상
+            throw new IllegalArgumentException("["+resultCode+"] " + resultMsg);
+        }
+
+        JsonNode resultsNode = jsonNode.path("results");
+        for (JsonNode result : resultsNode) {
+            String name = result.path("name").asText();//legalcode,admcode,addr,roadaddr
+
+            if("legalcode".equals(name)){//법정동
+                area1 = result.path("region").path("area1").path("name").asText();//서울특별시
+                area2 = result.path("region").path("area2").path("name").asText();//강남구
+                area3 = result.path("region").path("area3").path("name").asText();//역삼동
+            } else if ("admcode".equals(name)){//행정동
+                area4 = result.path("region").path("area3").path("name").asText();//역삼 2동
+            } else if ("addr".equals(name)){//지번 주소
+                lotAddress = result.path("region").path("area1").path("name").asText();//서울특별시
+                lotAddress += " " + result.path("region").path("area2").path("name").asText();//강남구
+                lotAddress += " " + result.path("region").path("area3").path("name").asText();//역삼동
+                lotAddress += " " + result.path("land").path("number1").asText();//719
+                if(!"".equals(result.path("land").path("number2").asText(""))){
+                    lotAddress += "-" + result.path("land").path("number2").asText("");//24
+                }
+            } else if ("roadaddr".equals(name)){//도로명 주소
+                roadAddress = result.path("region").path("area1").path("name").asText();//서울특별시
+                roadAddress += " " + result.path("region").path("area2").path("name").asText();//강남구
+                roadAddress += " " + result.path("region").path("area3").path("name").asText();//역삼동
+                roadAddress += " " + result.path("land").path("name").asText();//85길
+                roadAddress += " " + result.path("land").path("number1").asText();//32
+            }
+        }
+
+        String lot = coord.split(",")[0];
+        String lat = coord.split(",")[1];
+
+        resultMap.put("lot",lot);
+        resultMap.put("lat",lat);
+        resultMap.put("area0","대한민국");
+        resultMap.put("area1",area1);
+        resultMap.put("area2",area2);
+        resultMap.put("area3",area3);
+        resultMap.put("area4",area4);
+        resultMap.put("lotAddress",lotAddress);
+        resultMap.put("roadAddress",roadAddress);
+
+        if(!"서울특별시".equals(area1)){
+            return null;
+        }
+
+        return resultMap;
     }
 
     public String getCoord(String address) {

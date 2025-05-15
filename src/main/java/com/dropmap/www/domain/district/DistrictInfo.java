@@ -9,6 +9,7 @@ import org.hibernate.annotations.Comment;
 @EqualsAndHashCode(of = "id")
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
