@@ -19,9 +19,9 @@ public class DropmapService {
 
         if(zoomLevel <= 10){//시
             districtInfoList = geolocationInfoRepository.findCityCounts();
-        } else if (zoomLevel == 11 || zoomLevel == 12){//구
+        } else if (zoomLevel == 11 || zoomLevel == 12 || zoomLevel == 13){//구
             districtInfoList = geolocationInfoRepository.findRegionCounts();
-        } else if (zoomLevel == 13){//법정동
+        } else if (zoomLevel == 14){//법정동
             districtInfoList = geolocationInfoRepository.findLegalDongCounts();
         }
         

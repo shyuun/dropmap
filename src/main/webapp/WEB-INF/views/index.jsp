@@ -84,6 +84,7 @@
 <script>
     const SEOUL_CENTER = new naver.maps.LatLng(37.56661, 126.978388);
     var markers = [], infoWindows = [], regionGeoJson = [], polygons = [];
+    var formerZoom = 10;
 
     const mapOptions = {
         center: SEOUL_CENTER,//지도의 초기 중심 좌표
@@ -114,13 +115,11 @@
         }
 
         naver.maps.Event.addListener(map, 'idle', function() {
-            console.log('지도 idle 발생');
             // 마커 갱신 로직 등
-            //updateMarkers(map, markers);
+            updateMarkers(map, markers);
         });
 
         naver.maps.Event.addListener(map, 'zoom_changed', function(zoom) {
-            console.log("ZOOM CHANGED!!");
             // ~10- 서울시
             // 11-구
             // 12-구
@@ -133,6 +132,8 @@
                 //클러스터링 호출
             } else {
                 //지역정보 가져오기
+                //TODO 같은 level일때는 안가져오게
+                formerZoom = zoom;
                 getDistrictInfo(zoom);
             }
         });
@@ -167,12 +168,12 @@
             //아이콘생성
             if(zoom <= 10){//시
                 htmlMarker = htmlMarker1;
-            } else if(zoom == 11 || zoom == 12){//구
+            } else if(zoom === 11 || zoom === 12 || zoom === 13){//구
                 htmlMarker = htmlMarker2;
-            } else if(zoom == 13){//법정동
+            } else if(zoom === 14){//법정동
                 htmlMarker = htmlMarker3;
-            } else if(zoom == 14){//클러스터링
-
+            } else if(zoom === 15){//클러스터링
+                htmlMarker = htmlMarker4
             } else {//마커
 
             }
@@ -213,10 +214,10 @@
             polygons.push(polygon);
         }
 
-        for(var i=0; i<markers.length; i++){
+        for (let i=0, ii=markers.length; i<ii; i++) {
             naver.maps.Event.addListener(markers[i], 'click', markerClickHandler(i));
             naver.maps.Event.addListener(markers[i], 'mouseover', function(e){
-                polygons[i].setOptions({//TODO polygons 수정
+                polygons[i].setOptions({
                     visible:true
                 })
             });
@@ -227,7 +228,6 @@
             });
         }
 
-        //TODO
         naver.maps.Event.trigger(map, 'idle');
     }
 
@@ -250,8 +250,35 @@
             } else {
                 zoom = prevZoom + 1;
             }
-            map.morph(new naver.maps.LatLng(e.coord.lat(), e.coord.lng()), zoom);
+            map.morph(new naver.maps.LatLng(e.coord.lat(), e.coord.lng()), zoom);//클릭한곳이 중앙으로 오게
         }
+    }
+
+    function updateMarkers(map, markers) {
+        var mapBounds = map.getBounds();
+        var marker, position;
+
+        for (var i = 0; i < markers.length; i++) {
+
+            marker = markers[i]
+            position = marker.getPosition();
+
+            if (mapBounds.hasLatLng(position)) {
+                showMarker(map, marker);
+            } else {
+                hideMarker(map, marker);
+            }
+        }
+    }
+
+    function showMarker(map, marker) {
+        if (marker.getMap()) return;
+        marker.setMap(map);
+    }
+
+    function hideMarker(map, marker) {
+        if (!marker.getMap()) return;
+        marker.setMap(null);
     }
 
     function generateCircleMarker(bgColor, hoverColor, width, height, fontSize, anchorX, anchorY, borderColor, hoverBorderColor, opacity) {
