@@ -1,13 +1,12 @@
 package com.dropmap.www.domain.district;
 
 import com.dropmap.www.domain.BaseUserEntity;
+import com.dropmap.www.domain.geolocation.GeolocationId;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Comment;
 
+@EqualsAndHashCode(of = "id")
 @Builder
 @Getter
 @NoArgsConstructor
@@ -16,30 +15,16 @@ import org.hibernate.annotations.Comment;
 @Table(name="DISTRICT_INFO")
 public class DistrictInfo extends BaseUserEntity {
 
-    @Id
-    @Comment("구역코드")
-    @Column(name = "DISTRICT_CODE")
-    private String districtCode;
-
-    @Comment("행정구역명")
-    @Column(name = "DISTRICT_NAME")
-    private String districtName;
-
-    @Comment("상위구역코드")
-    @Column(name = "P_DISTRICT_CODE")
-    private String pDistrictCode;
-
-    @Comment("상위구역명")
-    @Column(name = "P_DISTRICT_NAME")
-    private String pDistrictName;
+    @EmbeddedId
+    private DistrictInfoId id;
 
     @Comment("위도")
     @Column(name="LAT")
-    private String Lat;
+    private Double Lat;
 
     @Comment("경도")
     @Column(name="LOT")
-    private String Lot;
+    private Double Lot;
 
     @Comment("경계")
     @Column(name = "BOUNDARY", columnDefinition = "MEDIUMTEXT")

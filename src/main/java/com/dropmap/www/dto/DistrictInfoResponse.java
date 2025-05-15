@@ -16,9 +16,9 @@ import org.hibernate.annotations.Comment;
 @AllArgsConstructor
 public class DistrictInfoResponse extends BaseUserEntity {
     private final Long count;
-    private final String code;
+    private final String pName;
     private final String name;
-    private final String Lat;
-    private final String Lot;
+    private final Double Lat;
+    private final Double Lot;
     private final String boundary;
 }

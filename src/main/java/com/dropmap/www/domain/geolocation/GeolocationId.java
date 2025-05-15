@@ -15,16 +15,16 @@ public class GeolocationId implements Serializable {
     
     @Comment("위도")
     @Column(name="LAT")
-    private String Lat;
+    private Double Lat;
 
     @Comment("경도")
     @Column(name="LOT")
-    private String Lot;
+    private Double Lot;
     
     public GeolocationId() {}
 
     @Builder
-    public GeolocationId(String lat, String lot) {
+    public GeolocationId(Double lat, Double lot) {
         this.Lat = lat;
         this.Lot = lot;
     }

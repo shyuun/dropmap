@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class GeolocationSave {
-    private String lat;
-    private String lot;
+    private Double lat;
+    private Double lot;
     private String roadAddress;
     private String lotAddress;
     private String regionName;
@@ -16,7 +16,7 @@ public class GeolocationSave {
     private String admDongName;
 
     @Builder
-    public GeolocationSave(String lat, String lot, String roadAddress, String lotAddress, String regionName, String legalDongName, String admDongName){
+    public GeolocationSave(Double lat, Double lot, String roadAddress, String lotAddress, String regionName, String legalDongName, String admDongName){
         this.lat = lat;
         this.lot = lot;
         this.roadAddress = roadAddress;

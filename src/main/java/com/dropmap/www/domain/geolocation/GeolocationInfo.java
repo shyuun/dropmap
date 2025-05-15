@@ -22,17 +22,17 @@ public class GeolocationInfo extends BaseUserEntity {
     @EmbeddedId
     private GeolocationId id;
 
-    @Comment("구코드")
-    @Column(name="REGION_CODE")
-    private String regionCode;
+    @Comment("자치구명")
+    @Column(name="REGION_NAME")
+    private String regionName;
 
-    @Comment("법정동코드")
-    @Column(name="LEGAL_DONG_CODE")
-    private String legalDongCode;
+    @Comment("법정동명")
+    @Column(name="LEGAL_DONG_NAME")
+    private String legalDongName;
 
-    @Comment("행정동코드")
-    @Column(name="ADM_DONG_CODE")
-    private String admDongCode;
+    @Comment("행정동명")
+    @Column(name="ADM_DONG_NAME")
+    private String admDongName;
 
     @Comment("도로명주소")
     @Column(name="ROAD_ADDRESS")

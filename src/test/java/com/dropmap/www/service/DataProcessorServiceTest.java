@@ -9,6 +9,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -19,6 +21,9 @@ public class DataProcessorServiceTest {
 
     @Autowired
     private DataProcessorService dataProcessorService;
+    
+    @Autowired
+    private DataClearService dataClearService;
 
     @Autowired
     private DistrictInfoRepository districtInfoRepository;
@@ -28,15 +33,15 @@ public class DataProcessorServiceTest {
 
     @Test
     void 데이터_삭제가_정상적으로된다(){
-        dataProcessorService.clearDatabase();
+        dataClearService.clearDatabase();
 
         assertEquals(0, districtInfoRepository.count());
         assertEquals(0, geolocationInfoRepository.count());
     }
 
     @Test
-    void OPENAPI_저장이_정상적으로된다() throws JsonProcessingException, InterruptedException {
-        dataProcessorService.clearDatabase();
+    void OPENAPI_저장이_정상적으로된다() throws JsonProcessingException, InterruptedException, SQLException {
+        dataClearService.clearDatabase();
 
         assertEquals(0, districtInfoRepository.count());
         assertEquals(0, geolocationInfoRepository.count());
@@ -48,8 +53,8 @@ public class DataProcessorServiceTest {
     }
 
     @Test
-    void 지자체데이터_저장이_정상적으로된다() throws JsonProcessingException, InterruptedException {
-        dataProcessorService.clearDatabase();
+    void 지자체데이터_저장이_정상적으로된다() throws JsonProcessingException, InterruptedException, SQLException {
+        dataClearService.clearDatabase();
 
         assertEquals(0, districtInfoRepository.count());
         assertEquals(0, geolocationInfoRepository.count());
@@ -61,8 +66,8 @@ public class DataProcessorServiceTest {
     }
 
     @Test
-    void 비형식데이터_저장이_정상적으로된다() throws JsonProcessingException, InterruptedException {
-        dataProcessorService.clearDatabase();
+    void 비형식데이터_저장이_정상적으로된다() throws JsonProcessingException, InterruptedException, SQLException {
+        dataClearService.clearDatabase();
 
         assertEquals(0, districtInfoRepository.count());
         assertEquals(0, geolocationInfoRepository.count());

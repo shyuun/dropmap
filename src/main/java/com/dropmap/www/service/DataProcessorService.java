@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,11 +31,11 @@ public class DataProcessorService extends DataInitializer {
     private final NaverApiService naverApiService;
     private final DataInsertSerivce dataInsertService;
     private final UnstructuredDataService unstructedDataService;
+    private final DataClearService dataClearService;
 
     @Override
-    @Transactional
-    public void init() throws JsonProcessingException, InterruptedException {
-        clearDatabase();
+    public void init() throws JsonProcessingException, InterruptedException, SQLException {
+        dataClearService.clearDatabase();
         insertOpenApiData();
         insertFileApiData();
         insertUnstructuredData();
@@ -42,23 +43,14 @@ public class DataProcessorService extends DataInitializer {
     }
 
     @Override
-    protected void clearDatabase() {
-        sourceInfoRepository.resetUptYnAll();
-        districtInfoRepository.deleteAllInBatch();
-        geolocationInfoRepository.deleteAllInBatch();
-        entityManager.flush();
-        entityManager.clear();
-    }
-
-    @Override
-    protected void insertOpenApiData() throws JsonProcessingException, InterruptedException {
+    protected void insertOpenApiData() throws JsonProcessingException, InterruptedException, SQLException {
         Set<String> coordsSet = govDataApiService.getOpenApiCoords();
         List<Map<String, String>> structuredAddressList = naverApiService.getAddress(coordsSet);
         dataInsertService.insertData(structuredAddressList);
     }
 
     @Override
-    protected void insertFileApiData() throws JsonProcessingException {
+    protected void insertFileApiData() throws JsonProcessingException, SQLException {
         List<String> fileDataUrlList = govDataApiService.getFileDataApiUrls();
         Set<String> coordsSet = govDataApiService.getFileDataApiCoords(fileDataUrlList);
         List<Map<String, String>> structuredAddressList = naverApiService.getAddress(coordsSet);
@@ -66,7 +58,7 @@ public class DataProcessorService extends DataInitializer {
     }
 
     @Override
-    protected void insertUnstructuredData() throws JsonProcessingException {
+    protected void insertUnstructuredData() throws JsonProcessingException, SQLException {
         Set<String> coordsSet = unstructedDataService.getUnstructuredDataCoords();
         List<Map<String, String>> structuredAddressList = naverApiService.getAddress(coordsSet);
         dataInsertService.insertData(structuredAddressList);

@@ -24,5 +24,5 @@ public interface SourceInfoRepository extends JpaRepository<SourceInfo, Long> {
 
     @Modifying
     @Query("UPDATE SourceInfo s SET s.uptYn = 'N'")
-    int resetUptYnAll();
+    void resetUptYnAll();
 }

@@ -1,6 +1,7 @@
 package com.dropmap.www.service;
 
 import com.dropmap.www.domain.district.DistrictInfo;
+import com.dropmap.www.domain.district.DistrictInfoId;
 import com.dropmap.www.domain.district.DistrictInfoRepository;
 import com.dropmap.www.domain.geolocation.GeolocationInfoRepository;
 import com.dropmap.www.domain.source.SourceInfoRepository;
@@ -10,30 +11,36 @@ import com.dropmap.www.service.api.VworldApiService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
 public class DataInsertSerivce {
 
+    private final DataSource dataSource;
     private final DistrictInfoRepository districtInfoRepository;
     private final GeolocationInfoRepository geolocationInfoRepository;
     private final NaverApiService naverApiService;
     private final VworldApiService vworldApiService;
     private final SourceInfoRepository sourceInfoRepository;
 
-    public void insertData(List<Map<String, String>> addressList) throws JsonProcessingException {
+    @Transactional
+    public void insertData(List<Map<String, String>> addressList) throws JsonProcessingException, SQLException {
 
-        int pNum = 0,ppNum = 0;
-        String dNm = "",pDNm = "",ppDNm = "",dCd ="A0001", pDCd = "A0001", regionName = "";
+        String regionName = "";
         Set<String> regionNameSet = new HashSet<>();
+        LinkedHashSet<DistrictInfo> districtInfoSet = new LinkedHashSet<>();
+        LinkedHashSet<GeolocationSave> geolocationSaveSet = new LinkedHashSet<>();
 
         for(Map<String,String> m : addressList){
-            
+            regionNameSet.add(regionName);
+
             //오류데이터 NULL처리
             for (Map.Entry<String, String> entry : m.entrySet()) {
                 if (entry.getValue().trim().isEmpty()) {
@@ -41,80 +48,152 @@ public class DataInsertSerivce {
                 }
             }
             
-            String[] areaArr = {m.get("area0"),m.get("area1"),m.get("area2"),m.get("area3"),m.get("area4")};//{대한민국,서울특별시,강남구,역삼동,역삼 2동}
-            
-            for(int i=1; i<areaArr.length; i++){
-                dNm=areaArr[i];
-                pDNm=areaArr[i-1];
-                ppDNm = m.get("area0");
-                pNum = i-1;
+            //{m.get("area0"),m.get("area1"),m.get("area2"),m.get("area3"),m.get("area4")};//{대한민국,서울특별시,강남구,역삼동,역삼 2동}
 
-                if(i>1) {
-                    ppDNm=areaArr[i-2];
-                    ppNum = i-2;
-                }
+            for(int i=0; i<3; i++){
+                String pDistrictName = m.get("area"+i);
+                String districtName = m.get("area"+(i+1));
+                DistrictInfo districtInfo = DistrictInfo.builder().id(DistrictInfoId.builder()
+                        .pDistrictName(pDistrictName)
+                        .districtName(districtName)
+                        .build())
+                        .build();
 
-                int resultCnt = districtInfoRepository.existsDistrictNameAndParentName(pDNm,dNm);//키존재 확인
+                if(!districtInfoSet.contains(districtInfo)){
+                    //Set에 존재하지 않을때만 진행
+                    boolean exist = districtInfoRepository.existsDistrictNameAndParentName(pDistrictName,districtName);
 
-                if(resultCnt < 1){
-                    char prefix = (char) ('A' + (pNum));
-                    if(i == 1){
-                        pDCd = "A0001";//서울특별시
-                        dCd = "A0001";//서울특별시
-                    } else {
-                        pDCd = districtInfoRepository.findParentDistrictCodeByDistrictName(ppDNm,pDNm,ppNum);//부모키 가져옴
-                        dCd = districtInfoRepository.findDistrictCodeByDistrictName(prefix,pNum);//새키 생성
+                    if(!exist){
+                        //Set에도 존재하지않고 db에도 존재하지 않으면 DistrictInfo 저장을 위한 DTO 생성
+                        String address = pDistrictName + " " + districtName;
+
+                        if(i == 0){
+                            address = m.get("area1");//서울특별시
+                        } else if (i == 3){
+                            address = m.get("area2") + " " + m.get("area4");//강남구 역삼2동
+                        }
+
+                        String lot = null, lat = null;
+
+                        String coords = naverApiService.getCoord(address);//주소 -> 위경도 데이터
+
+                        if(coords != null){
+                            lot = coords.split(",")[0];
+                            lat = coords.split(",")[1];
+                        }
+
+                        String boundary = vworldApiService.getBoundary(coords,i);
+
+                        //구역정보 set에 추가
+                        districtInfoSet.add(DistrictInfo.builder()
+                                .id(DistrictInfoId.builder()
+                                        .pDistrictName(pDistrictName)
+                                        .districtName(districtName)
+                                        .build())
+                                .boundary(boundary)
+                                .Lat(Double.parseDouble(lat))
+                                .Lot(Double.parseDouble(lot))
+                                .depth(i)
+                                .build());
                     }
-
-                    if(i==2){
-                        regionName = dNm;
-                    }
-
-                    String address = "대한민국".equals(pDNm) ? dNm : pDNm + " " + dNm;
-
-                    if(i == 4){
-                        address = ppDNm + " " + dNm;//강남구 역삼2동
-                    }
-
-                    String lot = null, lat = null;
-                    String coords = naverApiService.getCoord(address);//주소 -> 위경도 데이터
-
-                    if(coords != null){
-                        lot = coords.split(",")[0];
-                        lat = coords.split(",")[1];
-                    }
-
-                    String boundary = vworldApiService.getBoundary(coords,pNum);//경계 데이터
-
-                    //시구동 행정구역정보 및 경계정보 추가
-                    districtInfoRepository.save(DistrictInfo.builder()
-                                    .districtCode(dCd)
-                                    .pDistrictCode(pDCd)
-                                    .districtName(dNm)
-                                    .pDistrictName(pDNm)
-                                    .boundary(boundary)
-                                    .Lat(lat)
-                                    .Lot(lot)
-                                    .depth(pNum)
-                            .build());
                 }
             }
 
-            //위경도 정보 insert
-            geolocationInfoRepository.insertGeolocation(GeolocationSave.builder()
-                    .lat(m.get("lat"))
-                    .lot(m.get("lot"))
+            //의류수거함 정보 set에 추가
+            geolocationSaveSet.add(GeolocationSave.builder()
+                    .lat(Double.parseDouble(m.get("lat")))
+                    .lot(Double.parseDouble(m.get("lot")))
                     .roadAddress(m.get("roadAddress"))
                     .lotAddress(m.get("lotAddress"))
                     .regionName(m.get("area2"))
                     .legalDongName(m.get("area3"))
                     .admDongName(m.get("area4"))
                     .build());
-
-            regionNameSet.add(regionName);
         }
+
+        //행정구역정보 BULK INSERT
+        batchInsertDistrictInfo(districtInfoSet);
+
+        //위경도 정보 BULK INSERT
+        batchInsertGeolocation(geolocationSaveSet);
 
         //출처정보 테이블에 업데이트여부 'Y'처리
         regionNameSet.forEach(sourceInfoRepository::updateUptYnBySourceDataName);
+    }
+
+    public void batchInsertGeolocation(LinkedHashSet<GeolocationSave> geolocationList) throws SQLException {
+        String sql = """
+        INSERT IGNORE INTO GEOLOCATION_INFO 
+        (LAT, LOT, REGION_NAME, LEGAL_DONG_NAME, ADM_DONG_NAME, ROAD_ADDRESS, LOT_ADDRESS, USE_YN, REG_DT, REG_NM, UPT_DT, UPT_NM)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM')
+        """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            conn.setAutoCommit(false); // 트랜잭션 시작
+
+            int batchSize = 1000;
+            int count = 0;
+
+            for (GeolocationSave item : geolocationList) {
+                pstmt.setDouble(1, item.getLat());
+                pstmt.setDouble(2, item.getLot());
+                pstmt.setString(3, item.getRegionName());
+                pstmt.setString(4, item.getLegalDongName());
+                pstmt.setString(5, item.getAdmDongName());
+                pstmt.setString(6, item.getRoadAddress());
+                pstmt.setString(7, item.getLotAddress());
+
+                pstmt.addBatch();
+                count++;
+
+                if (count % batchSize == 0) {
+                    pstmt.executeBatch();
+                }
+            }
+
+            pstmt.executeBatch(); // 남은 데이터 실행
+            conn.commit();        // 전체 커밋
+        } catch (SQLException e) {
+            throw new RuntimeException("배치 인서트 실패", e);
+        }
+    }
+
+    public void batchInsertDistrictInfo(Set<DistrictInfo> districtInfoSet) throws SQLException {
+        String sql = """
+        INSERT IGNORE INTO DISTRICT_INFO
+        (P_DISTRICT_NAME, DISTRICT_NAME, LAT, LOT, BOUNDARY, DEPTH, USE_YN, REG_DT, REG_NM, UPT_DT, UPT_NM)
+        VALUES (?, ?, ?, ?, ?, ?, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM')
+        """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            conn.setAutoCommit(false);
+            int batchSize = 1000;
+            int count = 0;
+
+            for (DistrictInfo info : districtInfoSet) {
+                pstmt.setString(1, info.getId().getPDistrictName());
+                pstmt.setString(2, info.getId().getDistrictName());
+                pstmt.setDouble(3, info.getLat());
+                pstmt.setDouble(4, info.getLot());
+                pstmt.setString(5, info.getBoundary());
+                pstmt.setInt(6, info.getDepth());
+
+                pstmt.addBatch();
+                count++;
+
+                if (count % batchSize == 0) {
+                    pstmt.executeBatch();
+                }
+            }
+
+            pstmt.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            throw new RuntimeException("DistrictInfo 배치 인서트 실패", e);
+        }
     }
 }

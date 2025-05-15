@@ -26,11 +26,11 @@ public class UnstructuredDataInfo extends BaseUserEntity {
 
     @Comment("위도")
     @Column(name="LAT")
-    private String Lat;
+    private Double Lat;
 
     @Comment("경도")
     @Column(name="LOT")
-    private String Lot;
+    private Double Lot;
 
     @Comment("주소")
     @Column(name="ADDRESS")

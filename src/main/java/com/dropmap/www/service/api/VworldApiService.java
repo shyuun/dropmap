@@ -60,6 +60,11 @@ public class VworldApiService {
         //에러처리
         apiErrorHandler(response,apiUri,retryCount);
 
+        if (!response.getBody().trim().startsWith("{")) {
+            log.error("예상치 못한 응답 형식: {}", response.getBody());
+            return null; // 혹은 예외 던지기
+        }
+
         //데이터파싱
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(response.getBody());

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoggingComponent {
 
-    @Before("execution(* com.dropmap.www.service..*(..)) || execution(* com.dropmap.www.web..*(..))")
+    @Before("execution(* com.dropmap.www.service..*(..)) || execution(* com.dropmap.www.web..*(..)) && !execution(* com.dropmap.www.service.api.*(..))")
     public void logMethodName(JoinPoint joinPoint) throws Throwable {
         log.info("=============================[ " + joinPoint.getSignature().getName() + " ]=============================");
     }
