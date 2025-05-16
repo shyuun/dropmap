@@ -15,18 +15,18 @@ public class GeolocationId implements Serializable {
     
     @Comment("위도")
     @Column(name="LAT")
-    private Double Lat;
+    private Double lat;
 
     @Comment("경도")
     @Column(name="LOT")
-    private Double Lot;
+    private Double lot;
     
     public GeolocationId() {}
 
     @Builder
     public GeolocationId(Double lat, Double lot) {
-        this.Lat = lat;
-        this.Lot = lot;
+        this.lat = lat;
+        this.lot = lot;
     }
 
     @Override
@@ -34,11 +34,11 @@ public class GeolocationId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GeolocationId GeolocationId = (GeolocationId) o;
-        return Objects.equals(Lat, GeolocationId.Lat) && Objects.equals(Lot, GeolocationId.Lot);
+        return Objects.equals(lat, GeolocationId.lat) && Objects.equals(lot, GeolocationId.lot);
     }
 
     @Override
     public int hashCode(){
-        return Objects.hash(Lat, Lot);
+        return Objects.hash(lat, lot);
     }
 }

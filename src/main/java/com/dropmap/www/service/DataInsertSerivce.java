@@ -1,5 +1,6 @@
 package com.dropmap.www.service;
 
+import com.dropmap.www.component.DistrictExistCache;
 import com.dropmap.www.domain.district.DistrictInfo;
 import com.dropmap.www.domain.district.DistrictInfoId;
 import com.dropmap.www.domain.district.DistrictInfoRepository;
@@ -19,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +32,7 @@ public class DataInsertSerivce {
     private final NaverApiService naverApiService;
     private final VworldApiService vworldApiService;
     private final SourceInfoRepository sourceInfoRepository;
+    private final DistrictExistCache districtExistCache;
 
     @Transactional
     public void insertData(List<Map<String, String>> addressList) throws JsonProcessingException, SQLException {
@@ -42,7 +45,7 @@ public class DataInsertSerivce {
         Map<String, DistrictInfo> districtInfoMap = new HashMap<>();
 
         for(Map<String,String> m : addressList){
-            regionNameSet.add(regionName);
+            regionNameSet.add(m.get("area2"));
 
             //오류데이터 NULL처리
             for (Map.Entry<String, String> entry : m.entrySet()) {
@@ -58,11 +61,8 @@ public class DataInsertSerivce {
                 String districtName = m.get("area"+(i+1));
                 String key = pDistrictName + "_" + districtName;
 
-                if(districtInfoMap.containsKey(key)) continue;//Set에 존재하지 않을때만 진행
-
-                boolean exist = districtInfoRepository.existsDistrictNameAndParentName(pDistrictName,districtName);
-
-                if(exist) continue;
+                if(districtInfoMap.containsKey(key)) continue;//Map에 존재하지 않을때만 진행
+                if (districtExistCache.isExist(key)) continue;//캐시변수 중복 체크
 
                 //Set에도 존재하지않고 db에도 존재하지 않으면 DistrictInfo 저장을 위한 DTO 생성
                 String address = switch (i) {
@@ -95,6 +95,7 @@ public class DataInsertSerivce {
                         .build();
 
                 districtInfoMap.put(key, info);
+                districtExistCache.put(key, true);
             }
 
             //의류수거함 정보 set에 추가

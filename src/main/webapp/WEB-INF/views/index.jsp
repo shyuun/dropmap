@@ -17,6 +17,7 @@
     <!-- 외부 라이브러리 -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=6gkjtzogno"></script>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script><%--TODO--%>
     <script src="${pageContext.request.contextPath}/js/MarkerClustering.js"></script>
 
     <style>
@@ -70,6 +71,24 @@
         #left { grid-area: left; }
         #right { grid-area: right; }
         #footer { grid-area: footer; }
+
+        #addressSearchBtn {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            z-index: 100;
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        #addressSearchBtn:hover {
+            background-color: #1565c0;
+        }
     </style>
 </head>
 <body>
@@ -77,6 +96,7 @@
     <div id="logo">DropMap</div>
     <div id="left">광고영역</div>
     <div id="map"></div>
+    <button id="addressSearchBtn">주소 검색</button>
     <div id="right">광고영역</div>
     <div id="footer">하단 광고영역</div>
 </div>
@@ -84,11 +104,11 @@
 <script>
     const SEOUL_CENTER = new naver.maps.LatLng(37.56661, 126.978388);
     var markers = [], infoWindows = [], regionGeoJson = [], polygons = [];
-    var formerZoom = 10;
+    var markerClustering;
 
     const mapOptions = {
         center: SEOUL_CENTER,//지도의 초기 중심 좌표
-        zoom: 10,
+        zoom: 17,
         minZoom: 10,
         zoomControl: true,
         zoomControlOptions: {
@@ -102,63 +122,173 @@
     var htmlMarker1 = generateCircleMarker('#1976d2', '#1565c0', 80, 80, 14, 40, 40, '#1565c0', '#0d47a1', 0.8);
     var htmlMarker2 = generateCircleMarker('#2196f3', '#1e88e5', 65, 65, 13, 32, 22, '#1565c0', '#0d47a1', 0.75);
     var htmlMarker3 = generateCircleMarker('#42a5f5', '#2196f3', 60, 60, 11, 30, 30, '#1565c0', '#0d47a1', 0.75);
-    var htmlMarker4 = generateCircleMarker('#2196f3', '#1e88e5', 55, 55, 10, 27, 27, '#1565c0', '#0d47a1', 0.75);
-    var htmlMarker5 = generateCircleMarker('#90caf9', '#64b5f6', 30, 30, 9, 15, 35, '#1565c0', '#0d47a1', 0.6);
+    var htmlMarker4 = {
+        content : `<div class="clusterBtn" style="cursor: pointer; width: 100px; height: 100px; line-height: 100px; font-size: 27px; color: white; text-align: center; font-weight: bold; background: url(/img/cluster_01.png) 0% 0% / contain;"></div>`,
+        size : N.Size(100,100),
+        anchor : N.Point(50,50)
+    }
 
     $(function() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 const location = new naver.maps.LatLng(position.coords.latitude, position.coords.longitude);
                 map.setCenter(location);
-                map.setZoom(10);
+                map.setZoom(17);
             });
         }
 
         naver.maps.Event.addListener(map, 'idle', function() {
             // 마커 갱신 로직 등
-            updateMarkers(map, markers);
+            getInfo(map.getZoom());
+            // updateMarkers(map, markers);
         });
 
         naver.maps.Event.addListener(map, 'zoom_changed', function(zoom) {
-            // ~10- 서울시
-            // 11-구
-            // 12-구
-            // 13-동
-            // 14-클러스터링
-            // 15~-마커
-            if(zoom > 15){
-                //마커가져오기
-            } else if(zoom > 14){
-                //클러스터링 호출
-            } else {
-                //지역정보 가져오기
-                //TODO 같은 level일때는 안가져오게
-                formerZoom = zoom;
-                getDistrictInfo(zoom);
-            }
+            getInfo(zoom);
         });
 
         naver.maps.Event.trigger(map, 'zoom_changed');
+
+        //카카오 주소검색 이벤트
+        document.getElementById("addressSearchBtn").addEventListener("click", function () {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    var fullAddr = data.roadAddress || data.jibunAddress;
+
+                    // 카카오 주소 → 좌표 변환
+                    $.ajax({
+                        url: "https://dapi.kakao.com/v2/local/search/address.json",
+                        type: "GET",
+                        data: { query: fullAddr },
+                        headers: {
+                            Authorization: "KakaoAK YOUR_REST_API_KEY"  // 카카오 REST API 키 넣기
+                        },
+                        success: function(res) {
+                            if (res.documents.length > 0) {
+                                var coord = res.documents[0].address;
+                                var lat = coord.y;
+                                var lng = coord.x;
+
+                                const latlng = new naver.maps.LatLng(lat, lng);
+                                map.setCenter(latlng);
+                                map.setZoom(17);
+
+                                new naver.maps.Marker({
+                                    position: latlng,
+                                    map: map
+                                });
+                            } else {
+                                alert("해당 주소에 대한 좌표를 찾을 수 없습니다.");
+                            }
+                        },
+                        error: function(err) {
+                            console.error(err);
+                            alert("주소 좌표 검색 중 오류가 발생했습니다.");
+                        }
+                    });
+                }
+            }).open();
+        });
     });
 
+    function getInfo(zoom){
+        // ~10- 서울시
+        // 11-구
+        // 12-구
+        // 13-동
+        // 14-클러스터링
+        // 15-클러스터링
+        // 16~-마커
+        if(zoom > 14){
+            //클러스터링,마커 호출
+            getMarkerInfo(zoom);
+        } else {
+            //지역정보 가져오기
+            getDistrictInfo(zoom);
+        }
+    }
+
+    function getMarkerInfo(zoom) {
+        const mapBounds = map.getBounds(); // 현재 지도 범위
+        const southWest = mapBounds.getSW(); // 남서쪽 (left-bottom)
+        const northEast = mapBounds.getNE(); // 북동쪽 (right-top)
+
+        $.ajax({
+            type : 'GET',
+            url : '/api/getMarkerInfo',
+            dataType : 'json',
+            contentType : 'application/json; charset=utf-8',
+            data : {"lat1" : southWest.lat(), "lat2" : northEast.lat(), "lot1" : southWest.lng(), "lot2": northEast.lng()}
+        }).done(function(data){
+            setMarkerInfo(data,zoom);
+        }).fail(function(error){
+            alert(JSON.stringify(error));
+        })
+    }
+
     function getDistrictInfo(zoom) {
-        console.log("getDistrictInfo!");
+        const mapBounds = map.getBounds(); // 현재 지도 범위
+        const southWest = mapBounds.getSW(); // 남서쪽 (left-bottom)
+        const northEast = mapBounds.getNE(); // 북동쪽 (right-top)
+
         $.ajax({
             type : 'GET',
             url : '/api/getDistrictInfo',
             dataType : 'json',
             contentType : 'application/json; charset=utf-8',
-            data : {"zoomLevel" : zoom}
+            data : {"zoomLevel" : zoom, "lat1" : southWest.lat(), "lat2" : northEast.lat(), "lot1" : southWest.lng(), "lot2": northEast.lng()}
         }).done(function(data){
-            console.log(data);
             setDistrictInfo(data,zoom);
         }).fail(function(error){
             alert(JSON.stringify(error));
         })
     }
 
+    function setMarkerInfo(data,zoom){
+        clearMarkers(markers,polygons,infoWindows);
+
+        for (var i = 0; i < data.length; i++) {
+            var spot = data[i];
+            var latlng = new naver.maps.LatLng(spot.lat, spot.lot);
+            var marker = new naver.maps.Marker({
+                position: latlng,
+                draggable: false,
+                map: map
+            });
+            var infoWindow = new naver.maps.InfoWindow({
+                content: '<div style="width:200px;text-align:center;padding:10px;font-size: 12px;">📍&nbsp;'+ spot.lotAddress +'</div>'
+            });
+
+            markers.push(marker);
+            infoWindows.push(infoWindow);
+        }
+
+        markerClustering = new MarkerClustering({
+            minClusterSize: 1,
+            maxZoom: 17,
+            map: map,
+            markers: markers,
+            disableClickZoom: false,
+            gridSize: 400,
+            icons: [htmlMarker4],
+            indexGenerator: [200],
+            stylingFunction: function (clusterMarker, count) {
+                $(clusterMarker.getElement()).find('.clusterBtn').text(count);
+            }
+        });
+
+        markerClustering.setMarkers(markers); // 새 markers 등록
+        markerClustering._redraw();           // 클러스터링 재생성
+
+        for (var i=0, ii=markers.length; i<ii; i++) {
+            naver.maps.Event.addListener(markers[i], 'click', markerClickHandler(i));
+        }
+
+        //naver.maps.Event.trigger(map, 'idle');
+    }
+
     function setDistrictInfo(data,zoom){
-        clearMarkers(markers,polygons);
+        clearMarkers(markers,polygons,infoWindows);
 
         for (var i = 0; i < data.length; i++) {
             var spot = data[i];
@@ -172,11 +302,8 @@
                 htmlMarker = htmlMarker2;
             } else if(zoom === 14){//법정동
                 htmlMarker = htmlMarker3;
-            } else if(zoom === 15){//클러스터링
-                htmlMarker = htmlMarker4
-            } else {//마커
-
             }
+
             var $content = $(htmlMarker.content).clone();
             $content.addClass(spot.code);
             $content.find(".marker_nm").text(spot.name);
@@ -215,7 +342,7 @@
         }
 
         for (let i=0, ii=markers.length; i<ii; i++) {
-            naver.maps.Event.addListener(markers[i], 'click', markerClickHandler(i));
+            naver.maps.Event.addListener(markers[i], 'click', districtInfoClickHandler(i));
             naver.maps.Event.addListener(markers[i], 'mouseover', function(e){
                 polygons[i].setOptions({
                     visible:true
@@ -228,20 +355,36 @@
             });
         }
 
-        naver.maps.Event.trigger(map, 'idle');
+        //naver.maps.Event.trigger(map, 'idle');
     }
 
-    function clearMarkers(markers,polygons){
+    function clearMarkers(markers,polygons,infoWindows){
         for(var i=0; i<markers.length; i++){
             markers[i].setMap(null);
-            polygons[i].setMap(null);
+            if(polygons.length !== 0){
+                polygons[i].setMap(null);
+            }
+
+            if(infoWindows .length !== 0){
+                infoWindows[i].setMap(null);
+            }
         }
         markers.length = 0;
-        polygons.length = 0;
+
+        if(polygons.length !== 0) {
+            polygons.length = 0;
+        }
+        if(infoWindows .length !== 0) {
+            infoWindows.length = 0;
+        }
+
+        if(markerClustering != null){
+            markerClustering._clearClusters();
+            markerClustering.setMap(null);
+        }
     }
 
-    // 해당 마커의 인덱스를 seq라는 클로저 변수로 저장하는 이벤트 핸들러를 반환합니다.
-    function markerClickHandler(seq) {
+    function districtInfoClickHandler(seq) {
         return function(e) {
             var prevZoom = map.getZoom();
             var zoom = 0;
@@ -251,6 +394,19 @@
                 zoom = prevZoom + 1;
             }
             map.morph(new naver.maps.LatLng(e.coord.lat(), e.coord.lng()), zoom);//클릭한곳이 중앙으로 오게
+        }
+    }
+
+    function markerClickHandler(seq) {
+        return function(e) {
+            var marker = markers[seq],
+                infoWindow = infoWindows[seq];
+
+            if (infoWindow.getMap()) {
+                infoWindow.close();
+            } else {
+                infoWindow.open(map, marker);
+            }
         }
     }
 
@@ -284,7 +440,7 @@
     function generateCircleMarker(bgColor, hoverColor, width, height, fontSize, anchorX, anchorY, borderColor, hoverBorderColor, opacity) {
         return {
             content: `
-            <div class="clusterBtn" style="
+            <div style="
                 width: ${'$'}{width}px;
                 height: ${'$'}{height}px;
                 background-color: ${'$'}{bgColor};

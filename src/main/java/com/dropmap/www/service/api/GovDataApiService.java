@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -153,9 +154,9 @@ public class GovDataApiService {
     }
 
     public Set<String> getFileDataApiCoords(List<String> fileDataUrlList) {
-        Set<String> coordsSet = new HashSet<>();
+        Set<String> coordsSet = ConcurrentHashMap.newKeySet(); // Thread-safe set
 
-        fileDataUrlList.stream().forEach(url -> {
+        fileDataUrlList.parallelStream().forEach(url -> {
             int retryCount = 0;
             String address = "";
 
@@ -182,7 +183,11 @@ public class GovDataApiService {
                 throw new RuntimeException(e);
             }
             JsonNode dataArr = jsonNode.path("data");
-            totalDataCount += jsonNode.path("totalCount").asInt(0);//data필드 존재하는지 확인
+            int count = jsonNode.path("totalCount").asInt(0);//data필드 존재하는지 확인
+
+            synchronized (this) {
+                totalDataCount += count;
+            }
 
             for(JsonNode data : dataArr){
                 String lat = data.path("위도").asText("").replaceAll("[^0-9eE.\\-]", "");
@@ -268,10 +273,10 @@ public class GovDataApiService {
     public void printStatLog(){
         Logger logger = LoggerFactory.getLogger(GovDataApiService.class);
         logger.info("================================= totalDataCount : " + totalDataCount + " | errorDataCount : " + errorDataCount + " | fixDataCount : " + fixDataCount + "=================================");
-        logger.info("=================================ABNORMAL_LIST COUNT : " + ABNORMAL_LIST.size() + "=================================");
-        logger.info("=================================ABNORMAL_LIST=================================");
-        logger.info(ABNORMAL_LIST.toString());
-        logger.info("=================================ABNORMAL_LIST=================================");
+//        logger.info("=================================ABNORMAL_LIST COUNT : " + ABNORMAL_LIST.size() + "=================================");
+//        logger.info("=================================ABNORMAL_LIST=================================");
+//        logger.info(ABNORMAL_LIST.toString());
+//        logger.info("=================================ABNORMAL_LIST=================================");
 
     }
 }
