@@ -17,7 +17,7 @@
     <!-- 외부 라이브러리 -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=6gkjtzogno"></script>
-    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script><%--TODO--%>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script src="${pageContext.request.contextPath}/js/MarkerClustering.js"></script>
 
     <style>
@@ -68,15 +68,22 @@
             font-size: 14px;
         }
 
-        #left { grid-area: left; }
+        #left {
+            grid-area: left;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;      /* 추가 */
+            align-items: center;
+            justify-content: flex-start; /* 수정 */
+            color: #666;
+            font-size: 14px;
+            padding-top: 20px;           /* 상단 여백 */
+        }
+
         #right { grid-area: right; }
         #footer { grid-area: footer; }
 
         #addressSearchBtn {
-            position: absolute;
-            top: 60px;
-            right: 20px;
-            z-index: 100;
             background-color: #1976d2;
             color: white;
             border: none;
@@ -85,6 +92,8 @@
             font-size: 14px;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            width: 100%;
+            margin-bottom: 20px; /* 하단 여백만 */
         }
         #addressSearchBtn:hover {
             background-color: #1565c0;
@@ -92,11 +101,19 @@
     </style>
 </head>
 <body>
+<div id="layer" style="display:none; position:fixed; top:46%; left:50%; transform:translate(-50%, -50%); z-index:100; border:1px solid #ccc; background:#fff; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+    <div style="text-align: right; padding: 8px; background-color: #ececec;">
+        <button onclick="closeDaumPostcode()" style="background: none; border: none; font-size: 16px; cursor: pointer;">❌</button>
+    </div>
+    <div id="daumPostcodeInner"></div>
+</div>
 <div id="wrapper">
     <div id="logo">DropMap</div>
-    <div id="left">광고영역</div>
+    <div id="left">
+        <button id="addressSearchBtn">🔍 주소 검색</button>
+        광고영역
+    </div>
     <div id="map"></div>
-    <button id="addressSearchBtn">주소 검색</button>
     <div id="right">광고영역</div>
     <div id="footer">하단 광고영역</div>
 </div>
@@ -151,17 +168,21 @@
 
         //카카오 주소검색 이벤트
         document.getElementById("addressSearchBtn").addEventListener("click", function () {
+            var element_layer = document.getElementById('layer');
+            var inner_container = document.getElementById('daumPostcodeInner');
+
             new daum.Postcode({
                 oncomplete: function(data) {
+                    element_layer.style.display = 'none'; // 닫기
                     var fullAddr = data.roadAddress || data.jibunAddress;
 
                     // 카카오 주소 → 좌표 변환
                     $.ajax({
-                        url: "https://dapi.kakao.com/v2/local/search/address.json",
+                        url: "https://dapi.kakao.com/v2/local/search/address.JSON",
                         type: "GET",
                         data: { query: fullAddr },
                         headers: {
-                            Authorization: "KakaoAK YOUR_REST_API_KEY"  // 카카오 REST API 키 넣기
+                            Authorization: "KakaoAK e71d9b282245d3aefd979738c1f585f6"  // 카카오 REST API 키 넣기
                         },
                         success: function(res) {
                             if (res.documents.length > 0) {
@@ -172,11 +193,6 @@
                                 const latlng = new naver.maps.LatLng(lat, lng);
                                 map.setCenter(latlng);
                                 map.setZoom(17);
-
-                                new naver.maps.Marker({
-                                    position: latlng,
-                                    map: map
-                                });
                             } else {
                                 alert("해당 주소에 대한 좌표를 찾을 수 없습니다.");
                             }
@@ -186,10 +202,21 @@
                             alert("주소 좌표 검색 중 오류가 발생했습니다.");
                         }
                     });
-                }
-            }).open();
+                },
+                width : '100%',
+                height : '100%'
+            }).embed(element_layer);
+
+            element_layer.style.display = 'block';
+            element_layer.style.width = '400px';
+            element_layer.style.height = '500px';
         });
     });
+
+    function closeDaumPostcode() {
+        document.getElementById('layer').style.display = 'none';
+    }
+
 
     function getInfo(zoom){
         // ~10- 서울시
