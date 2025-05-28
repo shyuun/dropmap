@@ -98,6 +98,14 @@
         #addressSearchBtn:hover {
             background-color: #1565c0;
         }
+        #currentLocationBtn .icon-path {
+            fill: #444; /* 기본 색상 */
+            transition: fill 0.3s ease;
+        }
+
+        #currentLocationBtn:hover .icon-path {
+            fill: #1976d2; /* 마우스 오버 시 파란색 */
+        }
     </style>
 </head>
 <body>
@@ -145,14 +153,19 @@
         anchor : N.Point(50,50)
     }
 
+    //현재 위치 아이콘
+    var locationBtnHtml =
+        `<button type="button" className="btn_location" aria-pressed="false" id="currentLocationBtn"
+                    style="position: absolute; top: 10px; right: 10px; z-index: 100; background: white; border: 1px solid #ccc; border-radius: 6px; padding: 6px;">
+                <svg width="24" height="24" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path class="icon-path"
+                        d="M13.89 23.01V21a.61.61 0 0 1 1.22 0v2.01a8.533 8.533 0 0 0 7.9-7.9H21a.61.61 0 0 1 0-1.22h2.01a8.533 8.533 0 0 0-7.9-7.9V8a.61.61 0 0 1-1.22 0V5.99a8.533 8.533 0 0 0-7.9 7.9H8a.61.61 0 0 1 0 1.22H5.99a8.533 8.533 0 0 0 7.9 7.9zm10.36-8.51c0 5.385-4.365 9.75-9.75 9.75s-9.75-4.365-9.75-9.75 4.365-9.75 9.75-9.75 9.75 4.365 9.75 9.75zm-9.75 1.625a1.625 1.625 0 1 0 0-3.25 1.625 1.625 0 0 0 0 3.25z"/>
+                </svg>
+            </button>`;
+
+
     $(function() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                const location = new naver.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                map.setCenter(location);
-                map.setZoom(17);
-            });
-        }
+        setCurrentPosition();
 
         naver.maps.Event.addListener(map, 'idle', function() {
             // 마커 갱신 로직 등
@@ -162,6 +175,19 @@
 
         naver.maps.Event.addListener(map, 'zoom_changed', function(zoom) {
             getInfo(zoom);
+        });
+
+        naver.maps.Event.once(map, 'init', function () {
+            //customControl 객체 이용하기
+            var customControl = new naver.maps.CustomControl(locationBtnHtml, {
+                position: naver.maps.Position.TOP_RIGHT
+            });
+
+            customControl.setMap(map);
+
+            naver.maps.Event.addDOMListener(customControl.getElement(), 'click', function () {
+                setCurrentPosition();
+            });
         });
 
         naver.maps.Event.trigger(map, 'zoom_changed');
@@ -235,7 +261,7 @@
         }
     }
 
-    function getMarkerInfo(zoom) {
+    function getMarkerInfo(zoom) {//TODO 위경도 바뀌어 두번호출
         const mapBounds = map.getBounds(); // 현재 지도 범위
         const southWest = mapBounds.getSW(); // 남서쪽 (left-bottom)
         const northEast = mapBounds.getNE(); // 북동쪽 (right-top)
@@ -247,8 +273,10 @@
             contentType : 'application/json; charset=utf-8',
             data : {"lat1" : southWest.lat(), "lat2" : northEast.lat(), "lot1" : southWest.lng(), "lot2": northEast.lng()}
         }).done(function(data){
-            setMarkerInfo(data,zoom);
+            console.log("✅ 마커 데이터", data);
+            setMarkerInfo(data);
         }).fail(function(error){
+            console.error("❌ 마커 요청 실패", error);
             alert(JSON.stringify(error));
         })
     }
@@ -271,7 +299,7 @@
         })
     }
 
-    function setMarkerInfo(data,zoom){
+    function setMarkerInfo(data){
         clearMarkers(markers,polygons,infoWindows);
 
         for (var i = 0; i < data.length; i++) {
@@ -462,6 +490,16 @@
     function hideMarker(map, marker) {
         if (!marker.getMap()) return;
         marker.setMap(null);
+    }
+
+    function setCurrentPosition() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const location = new naver.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                map.setCenter(location);
+                map.setZoom(17);
+            });
+        }
     }
 
     function generateCircleMarker(bgColor, hoverColor, width, height, fontSize, anchorX, anchorY, borderColor, hoverBorderColor, opacity) {
