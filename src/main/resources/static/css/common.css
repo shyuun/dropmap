@@ -1,0 +1,214 @@
+/* 1. 기본 리셋 및 전역 설정 */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+/* 2. 전체 레이아웃 (Grid 구조) */
+#wrapper {
+    display: grid;
+    grid-template-columns: 200px 1fr 200px;
+    grid-template-rows: 50px 1fr 120px;
+    grid-template-areas:
+        "logo header header"
+        "left map right"
+        "footer footer footer";
+    height: 100vh;
+    gap: 10px;
+}
+
+/* 3. 각 영역별 스타일 */
+#logo {
+    grid-area: logo;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    background-color: #1976d2;
+    color: white;
+}
+
+#map {
+    grid-area: map;
+    width: 100%;
+    height: 80%;
+    align-self: center;
+    justify-self: center;
+}
+
+#left, #right, #footer {
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 14px;
+}
+
+#left {
+    grid-area: left;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 20px;
+}
+
+#right { grid-area: right; }
+#footer { grid-area: footer; }
+
+/* 4. 버튼 공통 스타일 */
+.btn-primary,
+#addressSearchBtn {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    width: 100%;
+    margin-bottom: 20px;
+}
+.btn-primary:hover,
+#addressSearchBtn:hover {
+    background-color: #1565c0;
+}
+
+/* 5. 위치 버튼 */
+.btn_location {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 100;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px;
+    cursor: pointer;
+}
+.btn_location .icon-path,
+#currentLocationBtn .icon-path {
+    fill: #444;
+    transition: fill 0.3s ease;
+    shape-rendering: geometricPrecision;
+    text-rendering: geometricPrecision;
+}
+.btn_location:hover .icon-path,
+#currentLocationBtn:hover .icon-path {
+    fill: #1976d2;
+}
+
+/* 6. 클러스터 버튼 */
+.clusterBtn {
+    cursor: pointer;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    font-size: 27px;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    background: url(/img/cluster_01.png) 0% 0% / contain;
+}
+
+/* 7. 마커 공통 스타일 */
+.circle-marker {
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid;
+    transition: background-color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease,
+    opacity 0.3s ease;
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.circle-marker:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+.circle-marker:active {
+    transform: scale(0.97);
+}
+
+/* 8. 마커 색상별 스타일 */
+.marker-blue {
+    background-color: #1976d2;
+    opacity: 0.8;
+    border-color: #1565c0;
+}
+.marker-blue:hover {
+    background-color: #1565c0;
+    border-color: #0d47a1;
+}
+
+.marker-midblue {
+    background-color: #2196f3;
+    opacity: 0.75;
+    border-color: #1565c0;
+}
+.marker-midblue:hover {
+    background-color: #1e88e5;
+    border-color: #0d47a1;
+}
+
+.marker-lightblue {
+    background-color: #42a5f5;
+    opacity: 0.75;
+    border-color: #1565c0;
+}
+.marker-lightblue:hover {
+    background-color: #2196f3;
+    border-color: #0d47a1;
+}
+
+.marker_nm, .marker_cnt {
+    margin: 0;
+}
+
+/* 9. 레이어 팝업 */
+.popup-layer {
+    display: none;
+    position: fixed;
+    top: 46%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    border: 1px solid #ccc;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    width: 400px;
+    height: 500px;
+}
+.popup-header {
+    text-align: right;
+    padding: 8px;
+    background-color: #ececec;
+}
+.popup-close {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* 10. 광고영역 공통 */
+.ad-section {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+}
