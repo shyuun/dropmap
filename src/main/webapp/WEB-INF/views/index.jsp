@@ -19,16 +19,74 @@
     <script type="text/javascript" src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
-    <div id="layer" class="popup-layer">
+    <div id="searchLayer" class="popup-layer">
         <div class="popup-header">
-            <button onclick="closeDaumPostcode()" class="popup-close">❌</button>
+            <button onclick="closeSearchLayer()" class="popup-close">❌</button>
         </div>
         <div id="daumPostcodeInner"></div>
     </div>
+
+    <div id="infoLayer" class="popup-modal">
+        <div class="popup-content">
+            <button onclick="closeInfoLayer()" class="popup-close-inner">x</button>
+            <h2>🧺 의류수거함 배출 기준 안내</h2>
+
+            <h3>✅ 수거 가능한 품목</h3>
+            <table>
+                <thead>
+                <tr><th>분류</th><th>품목</th></tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>👕 의류류</td>
+                    <td>일반 의류 (상의, 하의, 외투 등)</td>
+                </tr>
+                <tr>
+                    <td>👟 패션잡화</td>
+                    <td>신발 (운동화, 구두 등)<br>일반 가방 (백팩, 숄더백 등)</td>
+                </tr>
+                <tr>
+                    <td>🛏 침구/직물류</td>
+                    <td>담요, 누비이불<br>커튼, 카펫<br>베개커버, 이불커버</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 2rem;">❌ 수거 불가능한 품목</h3>
+            <table>
+                <thead>
+                <tr><th>분류</th><th>품목</th></tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>🛏 침구류</td>
+                    <td>솜이불, 베개, 방석</td>
+                </tr>
+                <tr>
+                    <td>⚠️ 특수 품목</td>
+                    <td>전기장판, 전기요</td>
+                </tr>
+                <tr>
+                    <td>🧳 바퀴류</td>
+                    <td>바퀴 달린 신발 (롤러스케이트, 휠리스)<br>바퀴 달린 가방 (캐리어 등)</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <p style="margin-top: 1.5rem; font-size: 0.95rem; color: #555;">
+                🔔 <strong>TIP:</strong> 수거 불가 품목은 <em>대형폐기물 신고</em> 또는 <em>재활용센터</em>를 통해 배출해야 해요.<br>
+                지역마다 기준이 다를 수 있으니, <strong>자치구 안내문</strong>도 꼭 확인해 주세요!
+            </p>
+
+<%--            <button class="close-btn" onclick="document.getElementById('recyclingModal').style.display='none'">닫기</button>--%>
+        </div>
+    </div>
+
     <div id="wrapper">
         <div id="logo">DropMap</div>
         <div id="left">
             <button id="addressSearchBtn">🔍 주소 검색</button>
+            <button id="infoDetailBtn">🔍 의류수거함 정보</button>
             광고영역
         </div>
         <div id="map"></div>
@@ -99,9 +157,13 @@
                 naver.maps.Event.trigger(map, 'idle');
             });
 
+            document.getElementById("infoDetailBtn").addEventListener("click", function () {
+                $("#infoLayer").show();
+            });
+
             //카카오 주소검색 이벤트
             document.getElementById("addressSearchBtn").addEventListener("click", function () {
-                var element_layer = document.getElementById('layer');
+                var element_layer = document.getElementById('searchLayer');
                 var inner_container = document.getElementById('daumPostcodeInner');
 
                 new daum.Postcode({
@@ -146,12 +208,16 @@
             });
         });
 
-        function closeDaumPostcode() {
-            document.getElementById('layer').style.display = 'none';
+        function closeSearchLayer() {
+            document.getElementById('searchLayer').style.display = 'none';
         }
 
-        function getInfo(zoom){// 10 이하: 서울시 / 11~12: 구 / 13: 동 / 14~15: 클러스터링 / 16 이상: 마커
-            if(zoom > 14){
+        function closeInfoLayer() {
+            document.getElementById('infoLayer').style.display = 'none';
+        }
+
+        function getInfo(zoom) {// 10 이하: 서울시 / 11~12: 구 / 13: 동 / 14~15: 클러스터링 / 16 이상: 마커
+            if (zoom > 14){
                 //클러스터링,마커 호출
                 getMarkerInfo(zoom);
             } else {

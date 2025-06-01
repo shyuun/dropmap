@@ -212,3 +212,72 @@ body, html {
     font-size: 14px;
     color: #666;
 }
+
+.popup-modal {
+    position: fixed;
+    top: -60px; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    display: none;
+}
+
+.popup-content {
+    position: relative;
+    background: #fff;
+    max-width: 600px;
+    margin: 5% auto;
+    padding: 20px 30px;
+    border-radius: 8px;
+    font-family: 'Segoe UI', sans-serif;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+.popup-content h2, .popup-content h3 {
+    margin-top: 0;
+}
+
+.popup-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.popup-content th, .popup-content td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    vertical-align: top;
+}
+
+.popup-content th {
+    background-color: #f5f5f5;
+    text-align: left;
+}
+
+.close-btn {
+    margin-top: 20px;
+    background-color: #555;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.popup-close-inner {
+    position: absolute;
+    top: 12px;
+    right: 25px;
+    background: none;
+    border: none;
+    color: #444;
+    font-size: 28px;
+    font-weight: 800;
+    cursor: pointer;
+    z-index: 10;
+    line-height: 1;
+    padding: 0;
+}
+
+.popup-close-inner:hover {
+    color: #000;              /* 마우스 오버 시 진한 색 */
+}
