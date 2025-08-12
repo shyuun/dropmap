@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ABSPATH=$(readlink -f $0) # 심볼릭 링크를 따라가면서 스크립트의 절대경로를 찾음, $0 : 현재 실행중인 스크립트의 경로를 의미
-echo ">ABSPATH : $ABSPATH"
+echo ">ABSPATH : $IDLE_PORT"
 ABSDIR=$(dirname $ABSPATH) #현재 stop.sh가 속해있는 경로 찾음
 echo ">ABSDIR : $ABSDIR"
 source ${ABSDIR}/profile.sh #import구문, 해당코드로 profile.sh의 여러 function 사용가능

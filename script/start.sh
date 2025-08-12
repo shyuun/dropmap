@@ -4,7 +4,7 @@ ABSPATH=$(readlink -f $0)
 ABSDIR=$(dirname $ABSPATH)
 source ${ABSDIR}/profile.sh
 
-REPOSITORY=/home/ec2-user/app/dropmap/
+REPOSITORY=/home/ec2-user/app
 PROJECT_NAME=dropmap
 
 echo ">Build 파일 복사"
@@ -27,6 +27,6 @@ IDLE_PROFILE=$(find_idle_profile)
 
 echo "> $JAR_NAME 를 profile=$IDLE_PROFILE 로 실행합니다"
 nohup java \
--Dspring.config.location=classpath:/application-$IDLE_PROFILE.properties,/home/ec2-user/app/application-variable.properties \
+-Dspring.config.location=classpath:/application.properties,classpath:/application-$IDLE_PROFILE.properties,/home/ec2-user/app/application-variable.properties \
 -Dspring.profiles.active=$IDLE_PROFILE \
 -jar  $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
