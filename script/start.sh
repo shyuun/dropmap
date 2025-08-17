@@ -4,7 +4,7 @@ ABSPATH=$(readlink -f $0)
 ABSDIR=$(dirname $ABSPATH)
 source ${ABSDIR}/profile.sh
 
-REPOSITORY=/home/ec2-user/app
+REPOSITORY=/home/ec2-user/app/build/libs
 PROJECT_NAME=dropmap
 
 #echo ">Build 파일 복사"
@@ -13,20 +13,20 @@ PROJECT_NAME=dropmap
 #cp $REPOSITORY/zip/build/libs/*.war $REPOSITORY/
 
 echo "> 새 애플리케이션 배포"
-JAR_NAME=$(ls -tr $REPOSITORY/*.war | tail -n 1) #-t : 수정시간 순서로 , -r 거꾸로, tail -n 1 마지막 한줄을 출력
+WAR_NAME=$(ls -tr $REPOSITORY/*.war | tail -n 1) #-t : 수정시간 순서로 , -r 거꾸로, tail -n 1 마지막 한줄을 출력
 
-echo "> JAR Name: $JAR_NAME"
+echo "> WAR Name: $WAR_NAME"
 
-echo "> $JAR_NAME 에 실행권한 추가"
+echo "> $WAR_NAME 에 실행권한 추가"
 
-chmod +x $JAR_NAME
+chmod +x $WAR_NAME
 
-echo "> $JAR_NAME 실행"
+echo "> $WAR_NAME 실행"
 
 IDLE_PROFILE=$(find_idle_profile)
 
-echo "> $JAR_NAME 를 profile=$IDLE_PROFILE 로 실행합니다"
+echo "> $WAR_NAME 를 profile=$IDLE_PROFILE 로 실행합니다"
 nohup java \
 -Dspring.config.location=classpath:/application.properties,classpath:/application-$IDLE_PROFILE.properties,/home/ec2-user/app/application-variable.properties \
 -Dspring.profiles.active=$IDLE_PROFILE \
--jar  $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
+-jar  $WAR_NAME > $REPOSITORY/../../nohup.out 2>&1 &

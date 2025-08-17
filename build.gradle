@@ -47,3 +47,11 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+bootWar {
+    archiveFileName = 'dropmap.war'
+}
+
+war {
+    enabled = false
+}
