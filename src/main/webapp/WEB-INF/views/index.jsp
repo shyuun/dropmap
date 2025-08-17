@@ -13,7 +13,7 @@
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css"/>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=wzu7skvkq1"></script>
+    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=6gkjtzogno"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/MarkerClustering.js"></script>
     <script type="text/javascript" src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
