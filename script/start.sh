@@ -7,10 +7,10 @@ source ${ABSDIR}/profile.sh
 REPOSITORY=/home/ec2-user/app
 PROJECT_NAME=dropmap
 
-echo ">Build 파일 복사"
-echo "> cp $REPOSITORY/zip/build/libs/*.war $REPOSITORY/"
+#echo ">Build 파일 복사"
+#echo "> cp $REPOSITORY/zip/build/libs/*.war $REPOSITORY/"
 
-cp $REPOSITORY/zip/build/libs/*.war $REPOSITORY/
+#cp $REPOSITORY/zip/build/libs/*.war $REPOSITORY/
 
 echo "> 새 애플리케이션 배포"
 JAR_NAME=$(ls -tr $REPOSITORY/*.war | tail -n 1) #-t : 수정시간 순서로 , -r 거꾸로, tail -n 1 마지막 한줄을 출력
