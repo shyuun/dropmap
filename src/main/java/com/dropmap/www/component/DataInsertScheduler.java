@@ -14,7 +14,7 @@ import java.sql.SQLException;
 public class DataInsertScheduler {
     private final DataProcessorService dataProcessorService;
 
-    @Scheduled(cron = "0 15 10 19 * *") // 매달 15일 03:00
+    @Scheduled(cron = "0 55 10 19 * *") // 매달 15일 03:00
     //@PostConstruct//for test init onetime
     private void run() throws JsonProcessingException, InterruptedException, SQLException {
         dataProcessorService.init();
