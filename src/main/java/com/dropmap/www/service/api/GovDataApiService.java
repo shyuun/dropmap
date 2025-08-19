@@ -273,10 +273,5 @@ public class GovDataApiService {
     public void printStatLog(){
         Logger logger = LoggerFactory.getLogger(GovDataApiService.class);
         logger.info("================================= totalDataCount : " + totalDataCount + " | errorDataCount : " + errorDataCount + " | fixDataCount : " + fixDataCount + "=================================");
-//        logger.info("=================================ABNORMAL_LIST COUNT : " + ABNORMAL_LIST.size() + "=================================");
-//        logger.info("=================================ABNORMAL_LIST=================================");
-//        logger.info(ABNORMAL_LIST.toString());
-//        logger.info("=================================ABNORMAL_LIST=================================");
-
     }
 }
