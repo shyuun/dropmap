@@ -71,12 +71,33 @@
                     집 근처 의류수거함을 쉽게 찾아보세요!</div>
             </div>
         </div>
-        <div id="wrapper">
+        <%--<div id="wrapper">
             <div id="left"></div>
             <div id="map"></div>
             <div id="right"></div>
             <div id="footer"></div>
+        </div>--%>
+        <div id="wrapper" class="relative flex flex-col md:flex-row h-full">
+            <!-- 좌측 광고 -->
+            <aside id="leftAd" class="hidden md:block w-40 bg-gray-50 border-r border-gray-200">
+                <!-- 구글 애드센스 코드 들어갈 자리 -->
+                <div class="p-2 text-xs text-center">AD</div>
+            </aside>
+
+            <!-- 지도 -->
+            <main id="map" class="flex-1 min-h-[400px]"></main>
+
+            <!-- 우측 광고 -->
+            <aside id="rightAd" class="hidden md:block w-40 bg-gray-50 border-l border-gray-200">
+                <!-- 구글 애드센스 코드 들어갈 자리 -->
+                <div class="p-2 text-xs text-center"></div>
+            </aside>
         </div>
+
+        <!-- 하단 광고 (모바일에서만 표시) -->
+        <footer id="footerAd" class="block md:hidden w-full bg-gray-50 border-t border-gray-200">
+            <div class="p-2 text-center">AD</div>
+        </footer>
     </div>
 </div>
 
