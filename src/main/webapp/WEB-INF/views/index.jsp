@@ -30,6 +30,8 @@
 
         gtag('config', 'G-7YGDSJE9JB');
     </script>
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4694284708905804" crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'>
