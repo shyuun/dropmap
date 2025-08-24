@@ -8,7 +8,7 @@
     <title><c:out value="${status}"/> <c:out value="${error}"/></title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css"/>
 </head>
-<body>
+<body class="error-body">
 <div class="error-wrap">
     <div class="brand"></div>
     <span class="badge">Error</span>

@@ -35,7 +35,7 @@
 </head>
 <body>
 <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'>
-    <div class="layout-container flex h-full grow flex-col">
+    <div class="layout-container flex h-full grow flex-col min-h-0">
         <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f1f2f4] px-10 py-3">
             <a href="javascript:location.reload()">
                 <div class="flex items-center gap-4 text-[#121416]">
@@ -64,28 +64,27 @@
                 </button>
             </div>
         </header>
-        <div id="guideBar"
-             class="mx-10 mt-3 rounded-xl bg-[#f1f2f4] text-[#121416] px-4 py-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div class="text-sm md:text-base leading-relaxed">
-                <div>👕 dropmap은 <strong>의류수거함 위치 안내 서비스</strong>입니다.<br class="md:hidden">
-                    집 근처 의류수거함을 쉽게 찾아보세요!</div>
+        <div id="guideBar" class="mx-3 md:mx-10 mt-3">
+            <div class="rounded-xl bg-white/90 backdrop-blur border border-gray-200 shadow-sm p-3 md:p-4">
+                <div class="flex items-start gap-3">
+                    <div class="flex-1 text-sm md:text-base leading-relaxed">
+                        👕 dropmap은 <strong>의류수거함 위치 안내 서비스</strong>입니다.
+                        <!-- 모바일에서만 보이는 줄바꿈 -->
+                        <br class="md:hidden">
+                        집 근처 의류수거함을 쉽게 찾아보세요!
+                    </div>
+                </div>
             </div>
         </div>
-        <%--<div id="wrapper">
-            <div id="left"></div>
-            <div id="map"></div>
-            <div id="right"></div>
-            <div id="footer"></div>
-        </div>--%>
-        <div id="wrapper" class="relative flex flex-col md:flex-row h-full">
+        <div id="wrapper" class="relative flex flex-1 min-h-0 w-full md:flex-row flex-col">
             <!-- 좌측 광고 -->
             <aside id="leftAd" class="hidden md:block w-40 bg-gray-50 border-r border-gray-200">
                 <!-- 구글 애드센스 코드 들어갈 자리 -->
-                <div class="p-2 text-xs text-center">AD</div>
+                <div class="p-2 text-xs text-center"></div>
             </aside>
 
             <!-- 지도 -->
-            <main id="map" class="flex-1 min-h-[400px]"></main>
+            <div id="map" class="flex-1 w-full h-[70dvh] md:h-auto md:min-h-0"></div>
 
             <!-- 우측 광고 -->
             <aside id="rightAd" class="hidden md:block w-40 bg-gray-50 border-l border-gray-200">
@@ -96,7 +95,7 @@
 
         <!-- 하단 광고 (모바일에서만 표시) -->
         <footer id="footerAd" class="block md:hidden w-full bg-gray-50 border-t border-gray-200">
-            <div class="p-2 text-center">AD</div>
+            <div class="p-2 text-center"></div>
         </footer>
     </div>
 </div>
