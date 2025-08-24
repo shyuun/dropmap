@@ -20,6 +20,16 @@
     <link rel="stylesheet" as="style" onload="this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Plus+Jakarta+Sans%3Awght%40400%3B500%3B700%3B800"/>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7YGDSJE9JB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-7YGDSJE9JB');
+    </script>
 </head>
 <body>
 <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'>
@@ -52,6 +62,13 @@
                 </button>
             </div>
         </header>
+        <div id="guideBar"
+             class="mx-10 mt-3 rounded-xl bg-[#f1f2f4] text-[#121416] px-4 py-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div class="text-sm md:text-base leading-relaxed">
+                <div>👕 dropmap은 <strong>의류수거함 위치 안내 서비스</strong>입니다.<br class="md:hidden">
+                    집 근처 의류수거함을 쉽게 찾아보세요!</div>
+            </div>
+        </div>
         <div id="wrapper">
             <div id="left"></div>
             <div id="map"></div>
@@ -146,14 +163,42 @@
         anchor : N.Point(50,50)
     }
 
-    //현재 위치 아이콘
-    var locationBtnHtml =
-        `<button type="button" class="btn_location" id="currentLocationBtn" aria-pressed="false">
+    naver.maps.Event.once(map, 'init', function () {
+        //customControl 객체 이용하기
+
+        var locationBtnHtml =
+            `<button type="button" class="btn_location" id="currentLocationBtn" aria-pressed="false">
                 <svg width="24" height="24" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path class="icon-path"
                         d="M13.89 23.01V21a.61.61 0 0 1 1.22 0v2.01a8.533 8.533 0 0 0 7.9-7.9H21a.61.61 0 0 1 0-1.22h2.01a8.533 8.533 0 0 0-7.9-7.9V8a.61.61 0 0 1-1.22 0V5.99a8.533 8.533 0 0 0-7.9 7.9H8a.61.61 0 0 1 0 1.22H5.99a8.533 8.533 0 0 0 7.9 7.9zm10.36-8.51c0 5.385-4.365 9.75-9.75 9.75s-9.75-4.365-9.75-9.75 4.365-9.75 9.75-9.75 9.75 4.365 9.75 9.75zm-9.75 1.625a1.625 1.625 0 1 0 0-3.25 1.625 1.625 0 0 0 0 3.25z"/>
                 </svg>
             </button>`;
+
+        var noticeHtml =
+            ` <div class="rounded-lg bg-white px-3 py-2 shadow-md border border-gray-200 text-xs md:text-sm leading-relaxed">
+            <div class="flex flex-col gap-0.5">
+              <span>🟦 마커 = 의류수거함 위치</span>
+              <span>🖱️ 클릭 = 상세 위치</span>
+            </div>
+          </div>`;
+
+        var customControl = new naver.maps.CustomControl(locationBtnHtml, {
+            position: naver.maps.Position.TOP_RIGHT
+        });
+
+        customControl.setMap(map);
+
+        var customControl2 = new naver.maps.CustomControl(noticeHtml, {
+            position: naver.maps.Position.TOP_LEFT
+        });
+        customControl2.setMap(map);
+
+        naver.maps.Event.addDOMListener(customControl.getElement(), 'click', function () {
+            setCurrentPosition();
+        });
+
+        naver.maps.Event.trigger(map, 'idle');
+    });
 
     $(function() {
         setCurrentPosition();
@@ -164,21 +209,6 @@
             idleTimer = setTimeout(function () {
                 getInfo(map.getZoom());
             }, 200); // 200ms 안에 연속 idle 발생하면 무시
-        });
-
-        naver.maps.Event.once(map, 'init', function () {
-            //customControl 객체 이용하기
-            var customControl = new naver.maps.CustomControl(locationBtnHtml, {
-                position: naver.maps.Position.TOP_RIGHT
-            });
-
-            customControl.setMap(map);
-
-            naver.maps.Event.addDOMListener(customControl.getElement(), 'click', function () {
-                setCurrentPosition();
-            });
-
-            naver.maps.Event.trigger(map, 'idle');
         });
 
         document.getElementById("infoDetailBtn").addEventListener("click", function () {
@@ -508,6 +538,44 @@
             anchor: N.Point(anchorX, anchorY)
         };
     }
+
+    /*function setCustomControl(){
+        console.log("ddddd");
+        //현재 위치 아이콘
+        var locationBtnHtml =
+            `<button type="button" class="btn_location" id="currentLocationBtn" aria-pressed="false">
+                <svg width="24" height="24" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path class="icon-path"
+                        d="M13.89 23.01V21a.61.61 0 0 1 1.22 0v2.01a8.533 8.533 0 0 0 7.9-7.9H21a.61.61 0 0 1 0-1.22h2.01a8.533 8.533 0 0 0-7.9-7.9V8a.61.61 0 0 1-1.22 0V5.99a8.533 8.533 0 0 0-7.9 7.9H8a.61.61 0 0 1 0 1.22H5.99a8.533 8.533 0 0 0 7.9 7.9zm10.36-8.51c0 5.385-4.365 9.75-9.75 9.75s-9.75-4.365-9.75-9.75 4.365-9.75 9.75-9.75 9.75 4.365 9.75 9.75zm-9.75 1.625a1.625 1.625 0 1 0 0-3.25 1.625 1.625 0 0 0 0 3.25z"/>
+                </svg>
+            </button>`;
+
+        var noticeHtml =
+            ` <div class="rounded-lg bg-white px-3 py-2 shadow-md border border-gray-200 text-xs md:text-sm leading-relaxed">
+            <div class="font-semibold mb-1">👕 의류수거함 안내</div>
+            <div class="flex flex-col gap-0.5">
+              <span>🟦 마커 = 의류수거함 위치</span>
+              <span>🖱️ 클릭 = 상세 위치 / 길안내</span>
+            </div>
+          </div>`;
+
+        var customControl = new naver.maps.CustomControl(locationBtnHtml, {
+            position: naver.maps.Position.TOP_RIGHT
+        });
+
+        customControl.setMap(map);
+
+        var customControl2 = new naver.maps.CustomControl(noticeHtml, {
+            position: naver.maps.Position.TOP_LEFT
+        });
+        customControl2.setMap(map);
+
+        naver.maps.Event.addDOMListener(customControl.getElement(), 'click', function () {
+            setCurrentPosition();
+        });
+
+        naver.maps.Event.trigger(map, 'idle');
+    }*/
 </script>
 </body>
 </html>
