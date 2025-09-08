@@ -78,24 +78,63 @@
         </div>
         <div id="wrapper" class="relative flex flex-1 min-h-0 w-full md:flex-row flex-col">
             <!-- 좌측 광고 -->
-            <aside id="leftAd" class="hidden md:block w-40 bg-gray-50 border-r border-gray-200">
+            <aside id="leftAd" class="hidden md:block md:w-48 lg:w-56 xl:w-64 bg-gray-50 border-r border-gray-200">
                 <!-- 구글 애드센스 코드 들어갈 자리 -->
-                <div class="p-2 text-xs text-center"></div>
+                <div class="p-2 text-xs text-center">
+                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4694284708905804"
+                            crossorigin="anonymous"></script>
+                    <!-- 좌광고 -->
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-4694284708905804"
+                         data-ad-slot="3352268982"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
             </aside>
 
             <!-- 지도 -->
-            <div id="map" class="flex-1 w-full h-[70dvh] md:h-auto md:min-h-0"></div>
+            <div id="map" class="flex-1 w-full h-full min-h-0"></div>
 
             <!-- 우측 광고 -->
-            <aside id="rightAd" class="hidden md:block w-40 bg-gray-50 border-l border-gray-200">
+            <aside id="rightAd" class="hidden md:block md:w-48 lg:w-56 xl:w-64 bg-gray-50 border-l border-gray-200">
                 <!-- 구글 애드센스 코드 들어갈 자리 -->
-                <div class="p-2 text-xs text-center"></div>
+                <div class="p-2 text-xs text-center">
+                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4694284708905804"
+                            crossorigin="anonymous"></script>
+                    <!-- 우광고 -->
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-4694284708905804"
+                         data-ad-slot="5128524706"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
             </aside>
         </div>
 
         <!-- 하단 광고 (모바일에서만 표시) -->
-        <footer id="footerAd" class="block md:hidden w-full bg-gray-50 border-t border-gray-200">
-            <div class="p-2 text-center"></div>
+        <footer id="footerAd" class="block w-full bg-gray-50 border-t border-gray-200">
+            <div class="p-2 text-center">
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4694284708905804"
+                        crossorigin="anonymous"></script>
+                <!-- 좌광고 -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-4694284708905804"
+                     data-ad-slot="3352268982"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
         </footer>
     </div>
 </div>

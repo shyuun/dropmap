@@ -7,42 +7,24 @@ body, html {
     background-color: white;
 }
 
-#wrapper { width: 100%; min-height: 0; }
-
-#logo {
-    grid-area: logo;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    background-color: #ffffff;
-    color: #121416;
-}
-
-#map {
+#wrapper {
   width: 100%;
-  min-height: 70vh;     /* 모바일 강제 높이 */
-  height: auto;
+  min-height: 0;           /* flex 자식이 높이 계산 가능 */
 }
 
-#left, #right, #footer {
-    background-color: #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    font-size: 14px;
+#map{
+  width:100%;
+  height:100%;       /* 부모 flex 영역을 꽉 채움 */
+  min-height:0;      /* 오버플로 방지 */
 }
 
-#left {
-    grid-area: left;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding-top: 20px;
+#footerAd {
+    height:160px;        /* 필요 시 조절 */
+}
+#footerAd > div {
+    min-height: 160px;     /* 내부가 비어도 높이 유지 */
 }
 
-#right { grid-area: right; }
-#footer { grid-area: footer; }
 
 #top-controls {
     position: absolute;
@@ -193,13 +175,6 @@ body, html {
 
 .marker_nm, .marker_cnt {
     margin: 0;
-}
-
-/* 9. 광고영역 공통 */
-.ad-section {
-    text-align: center;
-    font-size: 14px;
-    color: #666;
 }
 
 /* 10. 팝업 통일 스타일 */
