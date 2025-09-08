@@ -8,7 +8,7 @@
     <title>403 Forbidden</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css"/>
 </head>
-<body>
+<body class="error-body">
 <div class="error-wrap">
     <div class="brand"></div>
     <span class="badge" style="background:rgba(255,184,77,.12);border-color:rgba(255,184,77,.35);color:var(--warn)">Forbidden</span>

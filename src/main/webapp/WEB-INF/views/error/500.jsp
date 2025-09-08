@@ -8,7 +8,7 @@
     <title>500 Internal Server Error</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css"/>
 </head>
-<body>
+<body class="error-body">
 <div class="error-wrap">
     <div class="brand"></div>
     <span class="badge" style="background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.35);color:var(--danger)">Server Error</span>

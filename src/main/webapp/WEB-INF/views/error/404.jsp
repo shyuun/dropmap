@@ -8,7 +8,7 @@
     <title>404 Not Found</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css"/>
 </head>
-<body>
+<body class="error-body">
 <div class="error-wrap">
     <div class="brand"></div>
     <span class="badge">Not Found</span>

@@ -14,9 +14,4 @@ public class IndexController {
         mv.addObject("title", "welcome");
         return mv;
     }
-
-    @GetMapping("/{num}")
-    public ModelAndView goNumber(@PathVariable String num) {
-        return new ModelAndView("/error/"+num);
-    }
 }
