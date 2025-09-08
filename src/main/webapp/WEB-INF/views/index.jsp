@@ -20,9 +20,8 @@
     <link rel="stylesheet" as="style" onload="this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Plus+Jakarta+Sans%3Awght%40400%3B500%3B700%3B800"/>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7YGDSJE9JB"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4694284708905804" crossorigin="anonymous"></script><%-- Google adsense --%>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7YGDSJE9JB"></script><!-- Google tag (gtag.js) -->
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
@@ -30,12 +29,10 @@
 
         gtag('config', 'G-7YGDSJE9JB');
     </script>
-
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4694284708905804" crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'>
-    <div class="layout-container flex h-full grow flex-col min-h-0">
+    <div class="layout-container flex flex-col min-h-0">
         <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f1f2f4] px-10 py-3">
             <a href="javascript:location.reload()">
                 <div class="flex items-center gap-4 text-[#121416]">
@@ -69,71 +66,56 @@
                 <div class="flex items-start gap-3">
                     <div class="flex-1 text-sm md:text-base leading-relaxed">
                         👕 dropmap은 <strong>의류수거함 위치 안내 서비스</strong>입니다.
-                        <!-- 모바일에서만 보이는 줄바꿈 -->
                         <br class="md:hidden">
                         집 근처 의류수거함을 쉽게 찾아보세요!
                     </div>
                 </div>
             </div>
         </div>
-        <div id="wrapper" class="relative flex flex-1 min-h-0 w-full md:flex-row flex-col">
+        <main>
+            <div id="wrapper" class="relative flex flex-1 min-h-0 w-full md:flex-row flex-col">
             <!-- 좌측 광고 -->
             <aside id="leftAd" class="hidden md:block md:w-48 lg:w-56 xl:w-64 bg-gray-50 border-r border-gray-200">
                 <!-- 구글 애드센스 코드 들어갈 자리 -->
-                <div class="p-2 text-xs text-center">
-                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4694284708905804"
-                            crossorigin="anonymous"></script>
+                <div class="p-2 text-xs text-center min-h-[250px]">
                     <!-- 좌광고 -->
-                    <ins class="adsbygoogle"
+                    <ins class="adsbygoogle sideads"
                          style="display:block"
                          data-ad-client="ca-pub-4694284708905804"
                          data-ad-slot="3352268982"
                          data-ad-format="auto"
                          data-full-width-responsive="true"></ins>
-                    <script>
-                        (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
                 </div>
             </aside>
 
             <!-- 지도 -->
-            <div id="map" class="flex-1 w-full h-full min-h-0"></div>
+            <div id="map" class="w-full h-[60vh] md:h-[650px]"></div>
 
             <!-- 우측 광고 -->
             <aside id="rightAd" class="hidden md:block md:w-48 lg:w-56 xl:w-64 bg-gray-50 border-l border-gray-200">
                 <!-- 구글 애드센스 코드 들어갈 자리 -->
-                <div class="p-2 text-xs text-center">
-                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4694284708905804"
-                            crossorigin="anonymous"></script>
+                <div class="p-2 text-xs text-center min-h-[250px]">
                     <!-- 우광고 -->
-                    <ins class="adsbygoogle"
+                    <ins class="adsbygoogle sideads"
                          style="display:block"
                          data-ad-client="ca-pub-4694284708905804"
                          data-ad-slot="5128524706"
                          data-ad-format="auto"
                          data-full-width-responsive="true"></ins>
-                    <script>
-                        (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
                 </div>
             </aside>
         </div>
-
+        </main>
         <!-- 하단 광고 (모바일에서만 표시) -->
         <footer id="footerAd" class="block w-full bg-gray-50 border-t border-gray-200">
-            <div class="p-2 text-center">
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4694284708905804"
-                        crossorigin="anonymous"></script>
-                <!-- 좌광고 -->
-                <ins class="adsbygoogle"
+            <div class="p-2 text-center min-h-[320px]">
+                <!-- 하단광고 -->
+                <ins class="adsbygoogle footerads"
                      style="display:block"
                      data-ad-client="ca-pub-4694284708905804"
-                     data-ad-slot="3352268982"
+                     data-ad-slot="3048284131"
                      data-ad-format="auto"
                      data-full-width-responsive="true"></ins>
-                <script>
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
             </div>
         </footer>
     </div>
@@ -197,6 +179,11 @@
 </div>
 
 <script>
+    window.addEventListener('load', () => {
+        initVisibleAds();
+        window.addEventListener('resize', () => setTimeout(initVisibleAds, 300)); // 브레이크포인트 전환 대응
+    });
+
     let idleTimer;
     const SEOUL_CENTER = new naver.maps.LatLng(37.56661, 126.978388);
     var markers = [], infoWindows = [], regionGeoJson = [], polygons = [];
@@ -600,43 +587,13 @@
         };
     }
 
-    /*function setCustomControl(){
-        console.log("ddddd");
-        //현재 위치 아이콘
-        var locationBtnHtml =
-            `<button type="button" class="btn_location" id="currentLocationBtn" aria-pressed="false">
-                <svg width="24" height="24" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path class="icon-path"
-                        d="M13.89 23.01V21a.61.61 0 0 1 1.22 0v2.01a8.533 8.533 0 0 0 7.9-7.9H21a.61.61 0 0 1 0-1.22h2.01a8.533 8.533 0 0 0-7.9-7.9V8a.61.61 0 0 1-1.22 0V5.99a8.533 8.533 0 0 0-7.9 7.9H8a.61.61 0 0 1 0 1.22H5.99a8.533 8.533 0 0 0 7.9 7.9zm10.36-8.51c0 5.385-4.365 9.75-9.75 9.75s-9.75-4.365-9.75-9.75 4.365-9.75 9.75-9.75 9.75 4.365 9.75 9.75zm-9.75 1.625a1.625 1.625 0 1 0 0-3.25 1.625 1.625 0 0 0 0 3.25z"/>
-                </svg>
-            </button>`;
-
-        var noticeHtml =
-            ` <div class="rounded-lg bg-white px-3 py-2 shadow-md border border-gray-200 text-xs md:text-sm leading-relaxed">
-            <div class="font-semibold mb-1">👕 의류수거함 안내</div>
-            <div class="flex flex-col gap-0.5">
-              <span>🟦 마커 = 의류수거함 위치</span>
-              <span>🖱️ 클릭 = 상세 위치 / 길안내</span>
-            </div>
-          </div>`;
-
-        var customControl = new naver.maps.CustomControl(locationBtnHtml, {
-            position: naver.maps.Position.TOP_RIGHT
+    function initVisibleAds() {
+        document.querySelectorAll('ins.adsbygoogle').forEach((ins) => {
+            if (ins.getAttribute('data-ad-status') === 'filled') return; // 이미 렌더된 광고 건너뜀
+            const visible = ins.offsetParent !== null && ins.clientWidth > 0;
+            if (visible) { try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e){} }
         });
-
-        customControl.setMap(map);
-
-        var customControl2 = new naver.maps.CustomControl(noticeHtml, {
-            position: naver.maps.Position.TOP_LEFT
-        });
-        customControl2.setMap(map);
-
-        naver.maps.Event.addDOMListener(customControl.getElement(), 'click', function () {
-            setCurrentPosition();
-        });
-
-        naver.maps.Event.trigger(map, 'idle');
-    }*/
+    }
 </script>
 </body>
 </html>
