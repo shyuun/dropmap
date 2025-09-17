@@ -27,36 +27,8 @@
 
 ---
 
-## 아키텍처
+## 특징
+  - 서울시 전역 의류수거함 정보를 한눈에 확인 가능
+  - 다양한 출처 데이터를 자동 수집·정제·업데이트
+  - 지도 기반 직관적 시각화로 의류 재활용 접근성 향상
 
-```mermaid
-flowchart LR
-    subgraph DataSources[데이터 소스]
-        A[공공데이터 OpenAPI]
-        B[공공데이터 CSV]
-        C[비정제 데이터 (Excel/Web)]
-    end
-
-    subgraph Processing[데이터 처리<br/>(Spring Boot + Batch + JPA)]
-        D[정제 · 변환]
-    end
-
-    subgraph Database[DB]
-        E[(MySQL)]
-    end
-
-    subgraph Visualization[지도 시각화<br/>(JSP + JS + Naver Maps API + Vworld)]
-        F[지도 렌더링]
-    end
-
-    subgraph Infra[Infra<br/>(AWS EC2 + Jenkins + Nginx)]
-        G[배포 & 운영]
-    end
-
-    A --> D
-    B --> D
-    C --> D
-    D --> E
-    E --> F
-    G -.-> D
-    G -.-> F
