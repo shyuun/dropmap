@@ -10,6 +10,8 @@ import com.dropmap.www.template.DataInitializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,10 +37,17 @@ public class DataProcessorService extends DataInitializer {
 
     @Override
     public void init() throws JsonProcessingException, InterruptedException, SQLException {
+        Logger logger = LoggerFactory.getLogger(DataProcessorService.class);
+        long startTime = System.currentTimeMillis();
+
         dataClearService.clearDatabase();
         insertOpenApiData();
         insertFileApiData();
         insertUnstructuredData();
+
+        long endTime = System.currentTimeMillis();
+        logger.info("===== 총 api 호출시간 : " + (endTime-startTime) + "ms");
+        logger.info("===== 총 api 호출시간 : " + (endTime-startTime)/(1000*60) + "m");
         govDataApiService.printStatLog();
     }
 

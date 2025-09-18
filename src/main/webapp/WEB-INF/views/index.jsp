@@ -283,7 +283,7 @@
         setCurrentPosition();
 
         naver.maps.Event.addListener(map, 'idle', function() {
-            // 마커 갱신 로직 등
+            // 마커 갱신 로직 등, 움직임 종료시
             clearTimeout(idleTimer);
             idleTimer = setTimeout(function () {
                 getInfo(map.getZoom());
@@ -362,7 +362,7 @@
         document.getElementById('infoLayer').style.display = 'none';
     }
 
-    function getInfo(zoom) {// 10 이하: 서울시 / 11~12: 구 / 13: 동 / 14~15: 클러스터링 / 16 이상: 마커
+    function getInfo(zoom) {// 10: 시 / 11~13: 구 / 14: 동 / 15~16: 클러스터링 / 17~: 마커
         if (zoom > 14){
             //클러스터링,마커 호출
             getMarkerInfo(zoom);

@@ -1,6 +1,5 @@
 package com.dropmap.www.service.api;
 
-import com.dropmap.www.component.LoggingComponent;
 import com.dropmap.www.domain.source.SourceInfo;
 import com.dropmap.www.domain.source.SourceInfoRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,7 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;

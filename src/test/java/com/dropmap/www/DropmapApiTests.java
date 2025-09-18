@@ -282,7 +282,7 @@ public class DropmapApiTests {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        String serverName = "127.0.0.1";
+        String serverName = "https://dropmap.kr";
         String lot = "126.9306461";
         String lat = "37.60630915";
         String[] dataArr = {"LT_C_ADSIDO_INFO","LT_C_ADSIGG_INFO","LT_C_ADEMD_INFO"};
