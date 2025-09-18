@@ -1,5 +1,7 @@
 # 📦 Dropmap – 의류수거함 위치 기반 서비스
 
+🌐 Website: [https://dropmap.kr](https://dropmap.kr)
+
 ## 개요
 서울시 전역의 **의류수거함(헌옷수거함) 위치**를 직관적으로 확인할 수 있는 위치 기반 서비스입니다.  
 기존에 각 지자체 홈페이지에 흩어져 있던 엑셀/텍스트 데이터를 모아, **네이버 지도 기반 시각화**로 누구나 쉽게 의류 기부 및 재활용을 실천할 수 있도록 돕습니다.
@@ -32,3 +34,13 @@
   - 다양한 출처 데이터를 자동 수집·정제·업데이트
   - 지도 기반 직관적 시각화로 의류 재활용 접근성 향상
 
+---
+
+## 시스템 아키텍쳐
+<img width="1641" height="445" alt="dropmap_system_architecture" src="https://github.com/user-attachments/assets/370ad0ae-448e-4822-b966-5b356cb925a3" />
+
+---
+
+## 문의
+- 📧 Email : shyuun@naver.com
+- 🌐 Website: [https://dropmap.kr](https://dropmap.kr)
