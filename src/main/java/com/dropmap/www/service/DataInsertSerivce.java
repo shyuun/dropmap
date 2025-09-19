@@ -78,10 +78,10 @@ public class DataInsertSerivce {
                 if(coords != null){
                     lot = coords.split(",")[0];
                     lat = coords.split(",")[1];
-                }
 
-                // 비동기로 boundary 호출
-                futureBoundaryMap.put(key, vworldApiService.getBoundaryAsync(coords, i));
+                    // 비동기로 boundary 호출
+                    futureBoundaryMap.put(key, vworldApiService.getBoundaryAsync(coords, i));
+                }
 
                 //구역정보 set에 추가
                 DistrictInfo info = DistrictInfo.builder()
