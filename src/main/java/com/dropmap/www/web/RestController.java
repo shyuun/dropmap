@@ -6,14 +6,13 @@ import com.dropmap.www.service.DropmapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RestController
-public class DropmapController {
+@org.springframework.web.bind.annotation.RestController
+public class RestController {
 
     private final DropmapService dropmapService;
 

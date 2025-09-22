@@ -11,7 +11,13 @@ public class IndexController {
     @GetMapping("/")
     public ModelAndView index() {
         ModelAndView mv = new ModelAndView("index");
-        mv.addObject("title", "welcome");
+        return mv;
+    }
+
+    @GetMapping("/info/{pageName}")
+    public ModelAndView info(@PathVariable String pageName) {
+        ModelAndView mv = new ModelAndView("info");
+        mv.addObject("gbn",pageName);
         return mv;
     }
 }
