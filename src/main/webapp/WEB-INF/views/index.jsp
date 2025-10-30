@@ -67,6 +67,9 @@
                      data-full-width-responsive="true"></ins>
             </div>
         </footer>
+
+        <jsp:include page="infoSection.jsp"/>
+
         <jsp:include page="footer.jsp"/>
     </div>
 </div>
